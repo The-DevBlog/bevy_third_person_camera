@@ -8,6 +8,15 @@ use bevy::{
 use gamepad::GamePadPlugin;
 use mouse::MousePlugin;
 
+/// # Examples
+///
+/// ```
+/// use bevy::prelude::*;
+/// use bevy_third_person_camera::ThirdPersonCameraPlugin;
+/// fn main() {
+///     App::new().add_plugins(ThirdPersonCameraPlugin);
+/// }
+/// ```
 pub struct ThirdPersonCameraPlugin;
 
 impl Plugin for ThirdPersonCameraPlugin {
@@ -24,6 +33,18 @@ impl Plugin for ThirdPersonCameraPlugin {
     }
 }
 
+/// # Examples
+///
+/// ```
+/// use bevy::prelude::*;
+/// use bevy_third_person_camera::ThirdPersonCamera;
+/// fn spawn_camera(mut commands: Commands) {
+///     commands.spawn((
+///         ThirdPersonCamera::default(),
+///         Camera3dBundle::default()
+///     ));
+/// }
+/// ```
 #[derive(Component)]
 pub struct ThirdPersonCamera {
     pub focus: Vec3,
@@ -55,6 +76,28 @@ impl Default for ThirdPersonCamera {
 pub struct GamepadResource(pub Gamepad);
 
 /// Customizable gamepad settings
+///
+/// # Examples
+///
+/// ```
+/// use bevy::prelude::*;
+/// use bevy_third_person_camera::{CustomGamepadSettings, ThirdPersonCamera};
+/// fn spawn_camera(mut commands: Commands) {
+///    let gamepad = Gamepad::new(0);
+///    commands.spawn((
+///        ThirdPersonCamera {
+///            gamepad_settings: CustomGamepadSettings {
+///                x_sensitivity: 7.0,
+///                y_sensitivity: 4.0,
+///                zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
+///                zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
+///            },
+///            ..default()
+///        },
+///        Camera3dBundle::default(),
+///    ));
+/// }
+/// ```
 #[derive(Component)]
 pub struct CustomGamepadSettings {
     pub x_sensitivity: f32,
