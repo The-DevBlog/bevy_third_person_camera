@@ -45,7 +45,7 @@ impl Default for ThirdPersonCamera {
             enable_cursor_lock_toggle: true,
             lock_cursor: true,
             cursor_lock_key: KeyCode::Space,
-            zoom_bounds: (5.0, 10.0),
+            zoom_bounds: (3.0, 10.0),
             gamepad_settings: GamepadSettings::default(),
         }
     }
