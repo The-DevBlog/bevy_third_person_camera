@@ -54,6 +54,7 @@ impl Default for ThirdPersonCamera {
 #[derive(Resource)]
 pub struct GamepadResource(pub Gamepad);
 
+/// Customizable gamepad settings
 #[derive(Component)]
 pub struct CustomGamepadSettings {
     pub x_sensitivity: f32,
@@ -74,6 +75,7 @@ impl Default for CustomGamepadSettings {
     }
 }
 
+/// The desired target for the third person camera to look at
 #[derive(Component)]
 pub struct ThirdPersonCameraTarget;
 
