@@ -12,8 +12,14 @@ pub struct MousePlugin;
 
 impl Plugin for MousePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (orbit_mouse, zoom_mouse));
+        app.add_systems(Update, (orbit_mouse.run_if(orbit_condition), zoom_mouse));
     }
+}
+
+/// only run the orbit system if the cursor lock is disabled
+fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
+    let Ok(cam) = cam_q.get_single() else { return true };
+    return cam.lock_cursor;
 }
 
 // heavily referenced https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html
@@ -34,11 +40,7 @@ fn orbit_mouse(
         let window = window_q.get_single().unwrap();
         let delta_x = {
             let delta = rotation.x / window.width() * std::f32::consts::PI;
-            if cam.upside_down {
-                -delta
-            } else {
-                delta
-            }
+            delta
         };
 
         let delta_y = rotation.y / window.height() * PI;
@@ -68,7 +70,8 @@ fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut Thi
 
     if let Ok(mut cam) = cam_q.get_single_mut() {
         if scroll.abs() > 0.0 {
-            cam.radius -= scroll * cam.radius * 0.1;
+            let new_radius = cam.radius - scroll * cam.radius * 0.1;
+            cam.radius = new_radius.clamp(cam.zoom_bounds.0, cam.zoom_bounds.1);
         }
     }
 }
