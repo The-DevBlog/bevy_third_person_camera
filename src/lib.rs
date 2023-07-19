@@ -33,7 +33,7 @@ pub struct ThirdPersonCamera {
     pub lock_cursor: bool,
     pub cursor_lock_key: KeyCode,
     pub zoom_bounds: (f32, f32),
-    pub gamepad_settings: GamepadSettings,
+    pub gamepad_settings: CustomGamepadSettings,
 }
 
 impl Default for ThirdPersonCamera {
@@ -46,7 +46,7 @@ impl Default for ThirdPersonCamera {
             lock_cursor: true,
             cursor_lock_key: KeyCode::Space,
             zoom_bounds: (3.0, 10.0),
-            gamepad_settings: GamepadSettings::default(),
+            gamepad_settings: CustomGamepadSettings::default(),
         }
     }
 }
@@ -55,15 +55,14 @@ impl Default for ThirdPersonCamera {
 pub struct GamepadResource(pub Gamepad);
 
 #[derive(Component)]
-pub struct GamepadSettings {
+pub struct CustomGamepadSettings {
     pub x_sensitivity: f32,
     pub y_sensitivity: f32,
     pub zoom_in_button: GamepadButton,
     pub zoom_out_button: GamepadButton,
-    deadzone: f32,
 }
 
-impl Default for GamepadSettings {
+impl Default for CustomGamepadSettings {
     fn default() -> Self {
         let gamepad = Gamepad::new(0);
         Self {
@@ -71,7 +70,6 @@ impl Default for GamepadSettings {
             y_sensitivity: 4.0,
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
             zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
-            deadzone: 0.5,
         }
     }
 }

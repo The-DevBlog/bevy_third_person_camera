@@ -91,11 +91,10 @@ fn orbit_gamepad(
     let y_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickY);
 
     for (cam, mut cam_transform) in cam_q.iter_mut() {
-        let gp = &cam.gamepad_settings;
-
+        let deadzone = 0.5;
         let mut rotation = Vec2::ZERO;
         if let (Some(x), Some(y)) = (axis.get(x_axis), axis.get(y_axis)) {
-            if x.abs() > gp.deadzone || y.abs() > gp.deadzone {
+            if x.abs() > deadzone || y.abs() > deadzone {
                 rotation = Vec2::new(x, y);
             }
         }
