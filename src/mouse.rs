@@ -69,8 +69,8 @@ fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut Thi
     }
 
     if let Ok(mut cam) = cam_q.get_single_mut() {
-        if scroll.abs() > 0.0 {
-            let new_radius = cam.radius - scroll * cam.radius * 0.1;
+        if scroll.abs() >= 0.0 {
+            let new_radius = cam.radius - scroll * cam.radius * 0.1 * cam.zoom_sensitivity;
             cam.radius = new_radius.clamp(cam.zoom_bounds.0, cam.zoom_bounds.1);
         }
     }
