@@ -64,6 +64,7 @@ commands.spawn((
         lock_cursor: true,
         mouse_sensitivity: 2.0,
         zoom_bounds: (1.0, 10.0),
+        zoom_sensitivity: 1.0,
         gamepad_settings: CustomGamepadSettings {
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
