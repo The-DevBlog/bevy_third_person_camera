@@ -87,7 +87,7 @@ The cursor lock feature allows the mouse cursor to toggle between a locked, hidd
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.11 | 0.1                      |
+| 0.11 | 0.1.1                    |
 
 ## License
 
