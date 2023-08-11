@@ -47,29 +47,29 @@ impl Plugin for ThirdPersonCameraPlugin {
 /// ```
 #[derive(Component)]
 pub struct ThirdPersonCamera {
-    pub focus: Vec3,
-    pub radius: f32,
-    pub mouse_sensitivity: f32,
-    pub zoom_sensitivity: f32,
-    pub enable_cursor_lock_toggle: bool,
-    pub lock_cursor: bool,
     pub cursor_lock_key: KeyCode,
-    pub zoom_bounds: (f32, f32),
+    pub enable_cursor_lock_toggle: bool,
+    pub focus: Vec3,
     pub gamepad_settings: CustomGamepadSettings,
+    pub lock_cursor: bool,
+    pub mouse_sensitivity: f32,
+    pub radius: f32,
+    pub zoom_bounds: (f32, f32),
+    pub zoom_sensitivity: f32,
 }
 
 impl Default for ThirdPersonCamera {
     fn default() -> Self {
         ThirdPersonCamera {
-            focus: Vec3::ZERO,
-            radius: 5.0,
-            mouse_sensitivity: 1.0,
-            zoom_sensitivity: 1.0,
-            enable_cursor_lock_toggle: true,
-            lock_cursor: true,
             cursor_lock_key: KeyCode::Space,
-            zoom_bounds: (3.0, 10.0),
+            enable_cursor_lock_toggle: true,
+            focus: Vec3::ZERO,
             gamepad_settings: CustomGamepadSettings::default(),
+            lock_cursor: true,
+            mouse_sensitivity: 1.0,
+            radius: 5.0,
+            zoom_bounds: (3.0, 10.0),
+            zoom_sensitivity: 1.0,
         }
     }
 }
@@ -133,10 +133,15 @@ fn sync_player_camera(
 
     let delta = player.translation - camera.focus;
 
+    let offset = Vec3::new(-0.5, 0.25, 0.0);
+    let offset_translation = camera_transform.rotation.mul_vec3(offset);
+
     if delta != Vec3::ZERO {
         camera.focus = player.translation;
         camera_transform.translation += delta;
     }
+
+    camera_transform.translation += offset_translation;
 }
 
 fn toggle_cursor(
