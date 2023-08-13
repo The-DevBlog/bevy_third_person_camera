@@ -54,6 +54,7 @@ pub struct ThirdPersonCamera {
     pub lock_cursor: bool,
     pub mouse_sensitivity: f32,
     pub radius: f32,
+    pub xy_offset: (f32, f32),
     pub zoom_bounds: (f32, f32),
     pub zoom_sensitivity: f32,
 }
@@ -68,6 +69,7 @@ impl Default for ThirdPersonCamera {
             lock_cursor: true,
             mouse_sensitivity: 1.0,
             radius: 5.0,
+            xy_offset: (0.0, 0.0),
             zoom_bounds: (3.0, 10.0),
             zoom_sensitivity: 1.0,
         }
@@ -120,6 +122,18 @@ impl Default for CustomGamepadSettings {
     }
 }
 
+#[derive(Component)]
+pub struct Offset {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Offset {
+    pub fn get(&self) -> Vec3 {
+        Vec3::new(self.x, self.y, 0.0)
+    }
+}
+
 /// The desired target for the third person camera to look at
 #[derive(Component)]
 pub struct ThirdPersonCameraTarget;
@@ -129,19 +143,19 @@ fn sync_player_camera(
     mut cam_q: Query<(&mut ThirdPersonCamera, &mut Transform), Without<ThirdPersonCameraTarget>>,
 ) {
     let Ok(player) = player_q.get_single() else { return };
-    let Ok((mut camera, mut camera_transform)) = cam_q.get_single_mut() else { return };
+    let Ok((mut cam, mut cam_transform)) = cam_q.get_single_mut() else { return };
 
-    let delta = player.translation - camera.focus;
-
-    let offset = Vec3::new(-0.5, 0.25, 0.0);
-    let offset_translation = camera_transform.rotation.mul_vec3(offset);
+    let delta = player.translation - cam.focus;
+    let offset = cam_transform
+        .rotation
+        .mul_vec3(Vec3::new(cam.xy_offset.0, cam.xy_offset.1, 0.0));
 
     if delta != Vec3::ZERO {
-        camera.focus = player.translation;
-        camera_transform.translation += delta;
+        cam.focus = player.translation;
+        cam_transform.translation += delta;
     }
 
-    camera_transform.translation += offset_translation;
+    cam_transform.translation += offset;
 }
 
 fn toggle_cursor(
