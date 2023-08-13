@@ -10,13 +10,13 @@
 
 ## Getting Started
 
-Install the **bevy_third_person_camera** crate: 
+Add the **bevy_third_person_camera** crate: 
 
 ```
 cargo add bevy_third_person_camera
 ```
 
-Add the third person plugin: 
+Add the **ThirdPersonPlugin**: 
 
 ```rust
 .add_plugins(ThirdPersonCameraPlugin)
