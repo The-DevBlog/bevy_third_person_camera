@@ -49,15 +49,36 @@ commands.spawn((
 
 That's it! 
 
-## Default Mouse Controls
+## Examples
 
-- Scroll Wheel - Zoom in/out
-- Space - Unlock/lock cursor
+- default
+- custom
 
-## Default Gamepad Controls
+```
+cargo run --example <example name>
+```
 
-- DPad Up - Zoom in
-- DPad Down - Zoom out
+## Features
+
+### Offset
+
+The `offset` is of type (f32, f32) and will offset x and y values of the camera respectively. By default, the `offset` is set to `(0.0, 0.0)` and the `offset_toggle_key` and `offset_toggle_button` are `None`. 
+
+
+The following GIF has these values: 
+```rust
+offset: Offset::new(0.5, 0.25),
+offset_toggle_key: Some(KeyCode::T),
+offset_toggle_speed: 5.0 // default
+```
+
+![offset demo](assets/offsetDemo.gif)
+
+### Cursor Lock
+
+The cursor lock feature allows the mouse cursor to toggle between a locked, hidden state, to an unlocked, visible state. When unlocked, the orbiting feature is disabled, thus allowing the cursor to move freely within the window without disrupting the camera's transform. This feature can be fully disabled by setting the **enable_cursor_lock_toggle** value to **false** and will keep the cursor locked and hidden.
+
+![cursor lock demo](assets/cursorLockDemo.gif)
 
 ## Custom Settings
 
@@ -89,25 +110,13 @@ commands.spawn((
 ));
 ```
 
-## Offset
+## Default Controls
 
-The `offset` is of type (f32, f32) and will offset x and y values of the camera respectively. By default, the `offset` is set to `(0.0, 0.0)` and the `offset_toggle_key` and `offset_toggle_button` are `None`. 
-
-
-The following GIF has these values: 
-```rust
-offset: Offset::new(0.5, 0.25),
-offset_toggle_key: Some(KeyCode::T),
-offset_toggle_speed: 5.0 // default
-```
-
-![offset demo](assets/offsetDemo.gif)
-
-## Cursor Lock
-
-The cursor lock feature allows the mouse cursor to toggle between a locked, hidden state, to an unlocked, visible state. When unlocked, the orbiting feature is disabled, thus allowing the cursor to move freely within the window without disrupting the camera's transform. This feature can be fully disabled by setting the **enable_cursor_lock_toggle** value to **false** and will keep the cursor locked and hidden.
-
-![cursor lock demo](assets/cursorLockDemo.gif)
+|                    | Mouse/Keyboard | Gamepad    |
+| ------------------ | -------------- | ---------- |
+| Zoom In            | Scroll Up      | D Pad Up   |
+| Zoom Out           | Scroll Down    | D Pad Down |
+| Cursor Lock/Unlock | Space          | n/a        |
 
 ## Bevy Version Compatibility
 
