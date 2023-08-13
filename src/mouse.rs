@@ -16,14 +16,14 @@ impl Plugin for MousePlugin {
     }
 }
 
-/// only run the orbit system if the cursor lock is disabled
+// only run the orbit system if the cursor lock is disabled
 fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return true };
     return cam.lock_cursor;
 }
 
 // heavily referenced https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html
-fn orbit_mouse(
+pub fn orbit_mouse(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
     mut mouse_evr: EventReader<MouseMotion>,

@@ -44,7 +44,7 @@ fn connections(
     }
 }
 
-fn zoom_gamepad(
+pub fn zoom_gamepad(
     btns: Res<Input<GamepadButton>>,
     gamepad_res: Option<Res<GamepadResource>>,
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
@@ -58,15 +58,16 @@ fn zoom_gamepad(
     if let Ok(mut cam) = cam_q.get_single_mut() {
         let gp = &cam.gamepad_settings;
 
-        let d_pad_down = GamepadButton::new(gamepad, gp.zoom_out_button.button_type);
-        let d_pad_up = GamepadButton::new(gamepad, gp.zoom_in_button.button_type);
+        let zoom_out = GamepadButton::new(gamepad, gp.zoom_out_button.button_type);
+        let zoom_in = GamepadButton::new(gamepad, gp.zoom_in_button.button_type);
 
         let mut new_radius = cam.radius;
 
         // zoom out
-        if btns.pressed(d_pad_down) {
+        if btns.pressed(zoom_out) {
             new_radius += cam.radius * 0.01;
-        } else if btns.pressed(d_pad_up) {
+        // zoom in
+        } else if btns.pressed(zoom_in) {
             new_radius -= cam.radius * 0.01;
         }
 
@@ -74,7 +75,7 @@ fn zoom_gamepad(
     }
 }
 
-fn orbit_gamepad(
+pub fn orbit_gamepad(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
     axis: Res<Axis<GamepadAxis>>,
