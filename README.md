@@ -1,12 +1,20 @@
 # Bevy Third Person Camera
 
-![Demo](assets/demo.gif)
+- Zoom in/out
+- Orbit
+- Custom Offset
+- Cursor Lock
+- Full Gamepad Support!
+
+![camera demo](assets/cameraDemo.gif)
 
 ## Getting Started
 
 Install the **bevy_third_person_camera** crate: 
 
-`cargo install bevy_third_person_camera`
+```
+cargo install bevy_third_person_camera
+```
 
 Add the third person plugin: 
 
@@ -63,11 +71,15 @@ commands.spawn((
         enable_cursor_lock_toggle: true,
         lock_cursor: true,
         mouse_sensitivity: 2.0,
+        offset: Offset::new(0.5, 0.25),
+        offset_toggle_speed: 5.0,
+        offset_toggle_key: Some(KeyCode::T), // default is None
         zoom_bounds: (1.0, 10.0),
         zoom_sensitivity: 1.0,
         gamepad_settings: CustomGamepadSettings {
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
+            offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)), // default is None
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
             zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
         },
@@ -77,17 +89,31 @@ commands.spawn((
 ));
 ```
 
+## Offset
+
+The `offset` is of type (f32, f32) and will offset x and y values of the camera respectively. By default, the `offset` is set to `(0.0, 0.0)` and the `offset_toggle_key` and `offset_toggle_button` are `None`. 
+
+
+The following GIF has these values: 
+```rust
+offset: Offset::new(0.5, 0.25),
+offset_toggle_key: Some(KeyCode::T),
+offset_toggle_speed: 5.0 // default
+```
+
+![offset demo](assets/offsetDemo.gif)
+
 ## Cursor Lock
 
 The cursor lock feature allows the mouse cursor to toggle between a locked, hidden state, to an unlocked, visible state. When unlocked, the orbiting feature is disabled, thus allowing the cursor to move freely within the window without disrupting the camera's transform. This feature can be fully disabled by setting the **enable_cursor_lock_toggle** value to **false** and will keep the cursor locked and hidden.
 
-![Demo](assets/demo2.gif)
+![cursor lock demo](assets/cursorLockDemo.gif)
 
 ## Bevy Version Compatibility
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.11 | 0.1.1                    |
+| 0.11 | 0.1.2                    |
 
 ## License
 
