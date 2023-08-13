@@ -191,6 +191,7 @@ fn toggle_x_offset(
 ) {
     let Ok(mut cam) = cam_q.get_single_mut() else { return };
 
+    // check if gamepad toggle was pressed
     let gamepad_toggle_key_pressed =
         if let Some(gamepad_toggle_key) = cam.gamepad_settings.offset_toggle_button {
             btns.just_pressed(gamepad_toggle_key)
@@ -198,6 +199,7 @@ fn toggle_x_offset(
             false
         };
 
+    // check if keyboard toggle was pressed
     let offset_toggle_key_pressed = if let Some(toggle_key) = cam.offset_toggle_key {
         keys.just_pressed(toggle_key)
     } else {
@@ -219,26 +221,6 @@ fn toggle_x_offset(
     // Update the offset based on the direction and time
     cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_seconds())
         .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
-
-    // if let Some(gamepad_toggle_key) = cam.gamepad_settings.offset_toggle_key {}
-
-    // if let Some(toggle_key) = cam.offset_toggle_key {
-    //     if keys.just_pressed(toggle_key) {
-    //         // Switch direction by inverting the offset_flag
-    //         cam.offset.is_transitioning = !cam.offset.is_transitioning;
-    //     }
-
-    //     // Determine the transition speed based on direction
-    //     let transition_speed = if cam.offset.is_transitioning {
-    //         -cam.offset_toggle_speed
-    //     } else {
-    //         cam.offset_toggle_speed
-    //     };
-
-    //     // Update the offset based on the direction and time
-    //     cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_seconds())
-    //         .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
-    // }
 }
 
 fn toggle_cursor(
