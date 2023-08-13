@@ -25,6 +25,7 @@ impl Plugin for ThirdPersonCameraPlugin {
             Update,
             (
                 sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
+                toggle_x_offset,
                 toggle_cursor.run_if(toggle_cursor_enabled),
             ),
         );
@@ -52,7 +53,9 @@ pub struct ThirdPersonCamera {
     pub lock_cursor: bool,
     pub mouse_sensitivity: f32,
     pub radius: f32,
-    pub xy_offset: (f32, f32),
+    pub offset: Offset,
+    pub offset_toggle_key: Option<KeyCode>,
+    pub offset_toggle_speed: f32,
     pub zoom_bounds: (f32, f32),
     pub zoom_sensitivity: f32,
 }
@@ -67,9 +70,29 @@ impl Default for ThirdPersonCamera {
             lock_cursor: true,
             mouse_sensitivity: 1.0,
             radius: 5.0,
-            xy_offset: (0.0, 0.0),
+            offset: Offset::new(0.0, 0.0),
+            offset_toggle_speed: 4.0,
+            offset_toggle_key: None,
             zoom_bounds: (3.0, 10.0),
             zoom_sensitivity: 1.0,
+        }
+    }
+}
+
+/// Offset the camera behind the player. For example, an offset value of (0.5, 0.25) will
+/// place the camera closer the player's right shoulder
+pub struct Offset {
+    pub offset: (f32, f32),
+    offset_copy: (f32, f32),
+    is_transitioning: bool,
+}
+
+impl Offset {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self {
+            offset: (x, y),
+            offset_copy: (x, y),
+            is_transitioning: false,
         }
     }
 }
@@ -102,6 +125,7 @@ pub struct GamepadResource(pub Gamepad);
 /// ```
 #[derive(Component)]
 pub struct CustomGamepadSettings {
+    pub offset_toggle_button: Option<GamepadButton>,
     pub x_sensitivity: f32,
     pub y_sensitivity: f32,
     pub zoom_in_button: GamepadButton,
@@ -112,6 +136,7 @@ impl Default for CustomGamepadSettings {
     fn default() -> Self {
         let gamepad = Gamepad::new(0);
         Self {
+            offset_toggle_button: None,
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
@@ -146,13 +171,74 @@ fn sync_player_camera(
 
     // Calculate the desired camera translation based on focus, radius, and xy_offset
     let rotation_matrix = Mat3::from_quat(cam_transform.rotation);
-    let offset = rotation_matrix.mul_vec3(Vec3::new(cam.xy_offset.0, cam.xy_offset.1, 0.0));
+    // let offset = rotation_matrix.mul_vec3(Vec3::new(cam.xy_offset.0, cam.xy_offset.1, 0.0));
+    let offset = rotation_matrix.mul_vec3(Vec3::new(cam.offset.offset.0, cam.offset.offset.1, 0.0));
+
     let desired_translation =
         cam.focus + rotation_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.radius)) + offset;
 
     // Update the camera translation and focus
     let delta = player.translation - cam.focus;
     cam_transform.translation = desired_translation + delta;
+}
+
+// inverts the x offset. Example: left shoulder view -> right shoulder view & vice versa
+fn toggle_x_offset(
+    mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
+    keys: Res<Input<KeyCode>>,
+    time: Res<Time>,
+    btns: Res<Input<GamepadButton>>,
+) {
+    let Ok(mut cam) = cam_q.get_single_mut() else { return };
+
+    let gamepad_toggle_key_pressed =
+        if let Some(gamepad_toggle_key) = cam.gamepad_settings.offset_toggle_button {
+            btns.just_pressed(gamepad_toggle_key)
+        } else {
+            false
+        };
+
+    let offset_toggle_key_pressed = if let Some(toggle_key) = cam.offset_toggle_key {
+        keys.just_pressed(toggle_key)
+    } else {
+        false
+    };
+
+    if offset_toggle_key_pressed || gamepad_toggle_key_pressed {
+        // Switch direction by inverting the offset_flag
+        cam.offset.is_transitioning = !cam.offset.is_transitioning;
+    }
+
+    // Determine the transition speed based on direction
+    let transition_speed = if cam.offset.is_transitioning {
+        -cam.offset_toggle_speed
+    } else {
+        cam.offset_toggle_speed
+    };
+
+    // Update the offset based on the direction and time
+    cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_seconds())
+        .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
+
+    // if let Some(gamepad_toggle_key) = cam.gamepad_settings.offset_toggle_key {}
+
+    // if let Some(toggle_key) = cam.offset_toggle_key {
+    //     if keys.just_pressed(toggle_key) {
+    //         // Switch direction by inverting the offset_flag
+    //         cam.offset.is_transitioning = !cam.offset.is_transitioning;
+    //     }
+
+    //     // Determine the transition speed based on direction
+    //     let transition_speed = if cam.offset.is_transitioning {
+    //         -cam.offset_toggle_speed
+    //     } else {
+    //         cam.offset_toggle_speed
+    //     };
+
+    //     // Update the offset based on the direction and time
+    //     cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_seconds())
+    //         .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
+    // }
 }
 
 fn toggle_cursor(
