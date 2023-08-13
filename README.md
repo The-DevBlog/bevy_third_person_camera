@@ -13,7 +13,7 @@
 Install the **bevy_third_person_camera** crate: 
 
 ```
-cargo install bevy_third_person_camera
+cargo add bevy_third_person_camera
 ```
 
 Add the third person plugin: 
