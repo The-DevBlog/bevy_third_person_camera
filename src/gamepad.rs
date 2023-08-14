@@ -61,17 +61,17 @@ pub fn zoom_gamepad(
         let zoom_out = GamepadButton::new(gamepad, gp.zoom_out_button.button_type);
         let zoom_in = GamepadButton::new(gamepad, gp.zoom_in_button.button_type);
 
-        let mut new_radius = cam.radius;
+        let mut new_radius = cam.zoom.radius;
 
         // zoom out
         if btns.pressed(zoom_out) {
-            new_radius += cam.radius * 0.01;
+            new_radius += cam.zoom.radius * 0.01;
+            cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
         // zoom in
         } else if btns.pressed(zoom_in) {
-            new_radius -= cam.radius * 0.01;
+            new_radius -= cam.zoom.radius * 0.01;
+            cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
         }
-
-        cam.radius = new_radius.clamp(cam.zoom_bounds.0, cam.zoom_bounds.1);
     }
 }
 
@@ -125,6 +125,6 @@ pub fn orbit_gamepad(
 
         let rot_matrix = Mat3::from_quat(cam_transform.rotation);
         cam_transform.translation =
-            cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.radius));
+            cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
     }
 }

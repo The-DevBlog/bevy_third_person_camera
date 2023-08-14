@@ -41,7 +41,7 @@ fn spawn_camera(mut commands: Commands) {
             offset: Offset::new(0.5, 0.4),
             offset_toggle_key: Some(KeyCode::T),
             offset_toggle_speed: 7.5,
-            zoom_bounds: (1.5, 2.5),
+            zoom: Zoom::new(1.5, 3.0),
             gamepad_settings: CustomGamepadSettings {
                 offset_toggle_button: Some(GamepadButton::new(
                     gamepad,

@@ -95,7 +95,7 @@ commands.spawn((
         offset: Offset::new(0.5, 0.25),
         offset_toggle_speed: 5.0,
         offset_toggle_key: Some(KeyCode::T), // default is None
-        zoom_bounds: (1.0, 10.0),
+        zoom: (1.0, 10.0),
         zoom_sensitivity: 1.0,
         gamepad_settings: CustomGamepadSettings {
             x_sensitivity: 7.0,
