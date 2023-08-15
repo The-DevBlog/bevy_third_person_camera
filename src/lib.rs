@@ -161,7 +161,7 @@ impl Default for CustomGamepadSettings {
     fn default() -> Self {
         let gamepad = Gamepad::new(0);
         Self {
-            aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger)),
+            aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
             offset_toggle_button: None,
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
@@ -230,26 +230,36 @@ fn aim(
 
     if mouse_btn || gamepad_btn {
         let desired_zoom = cam.zoom.min * cam.aim_zoom;
+
         // radius_copy is used for restoring the radius (zoom) to it's
         // original value after releasing the aim button
         if cam.zoom.radius_copy.is_none() {
             cam.zoom.radius_copy = Some(cam.zoom.radius);
         }
 
+        let zoom_factor =
+            (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+
         // stop zooming in if current radius is less than desired zoom
-        if cam.zoom.radius <= desired_zoom {
+        if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
             cam.zoom.radius = desired_zoom;
         } else {
-            cam.zoom.radius -= cam.aim_speed * time.delta_seconds();
+            cam.zoom.radius -= zoom_factor;
         }
     } else {
         if let Some(radius) = cam.zoom.radius_copy {
+            let zoom_factor = (cam.zoom.radius_copy.unwrap() / cam.aim_zoom)
+                * cam.aim_speed
+                * time.delta_seconds();
+
             // stop zooming out if current radius is greater than original radius
-            if cam.zoom.radius >= radius {
+            if cam.zoom.radius >= radius || cam.zoom.radius + zoom_factor >= radius {
                 cam.zoom.radius = radius;
                 cam.zoom.radius_copy = None;
             } else {
-                cam.zoom.radius += cam.aim_speed * time.delta_seconds();
+                cam.zoom.radius += (cam.zoom.radius_copy.unwrap() / cam.aim_zoom)
+                    * cam.aim_speed
+                    * time.delta_seconds();
             }
         }
     }
