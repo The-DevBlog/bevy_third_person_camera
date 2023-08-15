@@ -101,17 +101,24 @@ Most settings can be overridden:
 ```rust
 let gamepad = Gamepad::new(0);
 commands.spawn((
+    // These are the default settings
     ThirdPersonCamera {
+        aim_enabled: false,
+        aim_button: Some(MouseButton::Right),
+        aim_speed: 3.0,
+        aim_zoom: 0.7,
         cursor_lock_key: KeyCode::Space,
         enable_cursor_lock_toggle: true,
         lock_cursor: true,
         mouse_sensitivity: 2.0,
-        offset: Offset::new(0.5, 0.25),
+        offset_enabled: false,
+        offset: Offset::new(0.5, 0.4),
         offset_toggle_speed: 5.0,
         offset_toggle_key: Some(KeyCode::T), // default is None
-        zoom: (1.0, 10.0),
+        zoom: Zoom::new(1.5, 3.0),
         zoom_sensitivity: 1.0,
         gamepad_settings: CustomGamepadSettings {
+            aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
             offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)), // default is None
