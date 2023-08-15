@@ -12,7 +12,10 @@ pub struct MousePlugin;
 
 impl Plugin for MousePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (orbit_mouse.run_if(orbit_condition), zoom_mouse));
+        app.add_systems(
+            Update,
+            (orbit_mouse.run_if(orbit_condition), zoom_mouse).chain(),
+        );
     }
 }
 
@@ -59,7 +62,8 @@ pub fn orbit_mouse(
     }
 
     let rot_matrix = Mat3::from_quat(cam_transform.rotation);
-    cam_transform.translation = cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.radius));
+    cam_transform.translation =
+        cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
 }
 
 fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut ThirdPersonCamera>) {
@@ -69,9 +73,10 @@ fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut Thi
     }
 
     if let Ok(mut cam) = cam_q.get_single_mut() {
-        if scroll.abs() >= 0.0 {
-            let new_radius = cam.radius - scroll * cam.radius * 0.1 * cam.zoom_sensitivity;
-            cam.radius = new_radius.clamp(cam.zoom_bounds.0, cam.zoom_bounds.1);
+        if scroll.abs() > 0.0 {
+            let new_radius =
+                cam.zoom.radius - scroll * cam.zoom.radius * 0.1 * cam.zoom_sensitivity;
+            cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
         }
     }
 }

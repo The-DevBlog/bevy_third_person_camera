@@ -38,10 +38,12 @@ fn spawn_camera(mut commands: Commands) {
             ..default()
         },
         ThirdPersonCamera {
-            offset: Offset::new(0.5, 0.4),
+            aim_enabled: true,
+            aim_speed: 3.0, // default
+            aim_zoom: 0.7,  // default
+            offset_enabled: true,
             offset_toggle_key: Some(KeyCode::T),
-            offset_toggle_speed: 7.5,
-            zoom_bounds: (1.5, 2.5),
+            zoom: Zoom::new(1.5, 3.0), // default
             gamepad_settings: CustomGamepadSettings {
                 offset_toggle_button: Some(GamepadButton::new(
                     gamepad,
@@ -69,7 +71,7 @@ fn spawn_world(
 
     let light = PointLightBundle {
         point_light: PointLight {
-            intensity: 2000.0,
+            intensity: 1500.0,
             ..default()
         },
         transform: Transform::from_xyz(0.0, 5.0, 0.0),

@@ -24,8 +24,9 @@ impl Plugin for ThirdPersonCameraPlugin {
         app.add_plugins((MousePlugin, GamePadPlugin)).add_systems(
             Update,
             (
+                aim.run_if(aim_condition),
                 sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
-                toggle_x_offset,
+                toggle_x_offset.run_if(toggle_x_offset_condition),
                 toggle_cursor.run_if(toggle_cursor_enabled),
             ),
         );
@@ -46,35 +47,62 @@ impl Plugin for ThirdPersonCameraPlugin {
 /// ```
 #[derive(Component)]
 pub struct ThirdPersonCamera {
+    pub aim_enabled: bool,
+    pub aim_button: Option<MouseButton>,
+    pub aim_speed: f32,
+    pub aim_zoom: f32,
     pub cursor_lock_key: KeyCode,
     pub enable_cursor_lock_toggle: bool,
     pub focus: Vec3,
     pub gamepad_settings: CustomGamepadSettings,
     pub lock_cursor: bool,
     pub mouse_sensitivity: f32,
-    pub radius: f32,
+    pub offset_enabled: bool,
     pub offset: Offset,
     pub offset_toggle_key: Option<KeyCode>,
     pub offset_toggle_speed: f32,
-    pub zoom_bounds: (f32, f32),
+    pub zoom: Zoom,
     pub zoom_sensitivity: f32,
 }
 
 impl Default for ThirdPersonCamera {
     fn default() -> Self {
         ThirdPersonCamera {
+            aim_enabled: false,
+            aim_button: Some(MouseButton::Right),
+            aim_speed: 3.0,
+            aim_zoom: 0.7,
             cursor_lock_key: KeyCode::Space,
             enable_cursor_lock_toggle: true,
             focus: Vec3::ZERO,
             gamepad_settings: CustomGamepadSettings::default(),
             lock_cursor: true,
             mouse_sensitivity: 1.0,
-            radius: 5.0,
-            offset: Offset::new(0.0, 0.0),
-            offset_toggle_speed: 4.0,
+            offset_enabled: false,
+            offset: Offset::new(0.5, 0.4),
+            offset_toggle_speed: 5.0,
             offset_toggle_key: None,
-            zoom_bounds: (3.0, 10.0),
+            zoom: Zoom::new(1.5, 3.0),
             zoom_sensitivity: 1.0,
+        }
+    }
+}
+
+/// Sets the zoom bounds (min & max)
+pub struct Zoom {
+    pub min: f32,
+    pub max: f32,
+    radius: f32,
+    radius_copy: Option<f32>,
+}
+
+impl Zoom {
+    pub fn new(min: f32, max: f32) -> Self {
+        Self {
+            min,
+            max,
+            radius: (min + max) / 2.0,
+            radius_copy: None,
         }
     }
 }
@@ -125,6 +153,7 @@ pub struct GamepadResource(pub Gamepad);
 /// ```
 #[derive(Component)]
 pub struct CustomGamepadSettings {
+    pub aim_button: Option<GamepadButton>,
     pub offset_toggle_button: Option<GamepadButton>,
     pub x_sensitivity: f32,
     pub y_sensitivity: f32,
@@ -136,6 +165,7 @@ impl Default for CustomGamepadSettings {
     fn default() -> Self {
         let gamepad = Gamepad::new(0);
         Self {
+            aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
             offset_toggle_button: None,
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
@@ -171,15 +201,94 @@ fn sync_player_camera(
 
     // Calculate the desired camera translation based on focus, radius, and xy_offset
     let rotation_matrix = Mat3::from_quat(cam_transform.rotation);
-    // let offset = rotation_matrix.mul_vec3(Vec3::new(cam.xy_offset.0, cam.xy_offset.1, 0.0));
-    let offset = rotation_matrix.mul_vec3(Vec3::new(cam.offset.offset.0, cam.offset.offset.1, 0.0));
+
+    // apply the offset if offset_enabled is true
+    let mut offset = Vec3::ZERO;
+    if cam.offset_enabled {
+        offset = rotation_matrix.mul_vec3(Vec3::new(cam.offset.offset.0, cam.offset.offset.1, 0.0));
+    }
 
     let desired_translation =
-        cam.focus + rotation_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.radius)) + offset;
+        cam.focus + rotation_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius)) + offset;
 
     // Update the camera translation and focus
     let delta = player.translation - cam.focus;
     cam_transform.translation = desired_translation + delta;
+}
+
+// only run aiming logic if `aim_enabled` is true
+fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else { return false };
+    cam.aim_enabled
+}
+
+fn aim(
+    mut cam_q: Query<
+        (&mut ThirdPersonCamera, &Transform),
+        (With<ThirdPersonCamera>, Without<ThirdPersonCameraTarget>),
+    >,
+    mouse: Res<Input<MouseButton>>,
+    mut player_q: Query<&mut Transform, With<ThirdPersonCameraTarget>>,
+    btns: Res<Input<GamepadButton>>,
+    time: Res<Time>,
+) {
+    let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else { return };
+
+    // check if aim button was pressed
+    let mouse_btn = if let Some(btn) = cam.aim_button {
+        mouse.pressed(btn)
+    } else {
+        false
+    };
+
+    let gamepad_btn = if let Some(btn) = cam.gamepad_settings.aim_button {
+        btns.pressed(btn)
+    } else {
+        false
+    };
+
+    if mouse_btn || gamepad_btn {
+        // rotate player or target to face direction he is aiming
+        let Ok(mut player_transform) = player_q.get_single_mut() else { return };
+        player_transform.look_to(cam_transform.forward(), Vec3::Y);
+
+        let desired_zoom = cam.zoom.min * cam.aim_zoom;
+
+        // radius_copy is used for restoring the radius (zoom) to it's
+        // original value after releasing the aim button
+        if cam.zoom.radius_copy.is_none() {
+            cam.zoom.radius_copy = Some(cam.zoom.radius);
+        }
+
+        let zoom_factor =
+            (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+
+        // stop zooming in if current radius is less than desired zoom
+        if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
+            cam.zoom.radius = desired_zoom;
+        } else {
+            cam.zoom.radius -= zoom_factor;
+        }
+    } else {
+        if let Some(radius_copy) = cam.zoom.radius_copy {
+            let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+
+            // stop zooming out if current radius is greater than original radius
+            if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
+                cam.zoom.radius = radius_copy;
+                cam.zoom.radius_copy = None;
+            } else {
+                cam.zoom.radius +=
+                    (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+            }
+        }
+    }
+}
+
+// only run toggle_x_offset if `offset_enabled` is true
+fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else { return false };
+    cam.offset_enabled
 }
 
 // inverts the x offset. Example: left shoulder view -> right shoulder view & vice versa
@@ -244,7 +353,7 @@ fn toggle_cursor(
     }
 }
 
-/// checks if the toggle cursor functionality is enabled
+// checks if the toggle cursor functionality is enabled
 fn toggle_cursor_enabled(cam_q: Query<&ThirdPersonCamera>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return true };
     cam.enable_cursor_lock_toggle
