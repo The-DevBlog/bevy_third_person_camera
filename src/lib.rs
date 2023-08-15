@@ -24,9 +24,9 @@ impl Plugin for ThirdPersonCameraPlugin {
         app.add_plugins((MousePlugin, GamePadPlugin)).add_systems(
             Update,
             (
-                aim,
+                aim.run_if(aim_condition),
                 sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
-                toggle_x_offset,
+                toggle_x_offset.run_if(toggle_x_offset_condition),
                 toggle_cursor.run_if(toggle_cursor_enabled),
             ),
         );
@@ -47,6 +47,7 @@ impl Plugin for ThirdPersonCameraPlugin {
 /// ```
 #[derive(Component)]
 pub struct ThirdPersonCamera {
+    pub aim_enabled: bool,
     pub aim_button: Option<MouseButton>,
     pub aim_speed: f32,
     pub aim_zoom: f32,
@@ -56,6 +57,7 @@ pub struct ThirdPersonCamera {
     pub gamepad_settings: CustomGamepadSettings,
     pub lock_cursor: bool,
     pub mouse_sensitivity: f32,
+    pub offset_enabled: bool,
     pub offset: Offset,
     pub offset_toggle_key: Option<KeyCode>,
     pub offset_toggle_speed: f32,
@@ -66,19 +68,21 @@ pub struct ThirdPersonCamera {
 impl Default for ThirdPersonCamera {
     fn default() -> Self {
         ThirdPersonCamera {
+            aim_enabled: false,
             aim_button: Some(MouseButton::Right),
-            aim_speed: 5.0,
-            aim_zoom: 0.5,
+            aim_speed: 3.0,
+            aim_zoom: 0.7,
             cursor_lock_key: KeyCode::Space,
             enable_cursor_lock_toggle: true,
             focus: Vec3::ZERO,
             gamepad_settings: CustomGamepadSettings::default(),
             lock_cursor: true,
             mouse_sensitivity: 1.0,
-            offset: Offset::new(0.0, 0.0),
-            offset_toggle_speed: 4.0,
+            offset_enabled: false,
+            offset: Offset::new(0.5, 0.4),
+            offset_toggle_speed: 5.0,
             offset_toggle_key: None,
-            zoom: Zoom::new(3.0, 10.0),
+            zoom: Zoom::new(1.5, 3.0),
             zoom_sensitivity: 1.0,
         }
     }
@@ -197,7 +201,12 @@ fn sync_player_camera(
 
     // Calculate the desired camera translation based on focus, radius, and xy_offset
     let rotation_matrix = Mat3::from_quat(cam_transform.rotation);
-    let offset = rotation_matrix.mul_vec3(Vec3::new(cam.offset.offset.0, cam.offset.offset.1, 0.0));
+
+    // apply the offset if offset_enabled is true
+    let mut offset = Vec3::ZERO;
+    if cam.offset_enabled {
+        offset = rotation_matrix.mul_vec3(Vec3::new(cam.offset.offset.0, cam.offset.offset.1, 0.0));
+    }
 
     let desired_translation =
         cam.focus + rotation_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius)) + offset;
@@ -207,13 +216,23 @@ fn sync_player_camera(
     cam_transform.translation = desired_translation + delta;
 }
 
+// only run aiming logic if `aim_enabled` is true
+fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else { return false };
+    cam.aim_enabled
+}
+
 fn aim(
-    mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
+    mut cam_q: Query<
+        (&mut ThirdPersonCamera, &Transform),
+        (With<ThirdPersonCamera>, Without<ThirdPersonCameraTarget>),
+    >,
     mouse: Res<Input<MouseButton>>,
+    mut player_q: Query<&mut Transform, With<ThirdPersonCameraTarget>>,
     btns: Res<Input<GamepadButton>>,
     time: Res<Time>,
 ) {
-    let Ok(mut cam) = cam_q.get_single_mut() else { return };
+    let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else { return };
 
     // check if aim button was pressed
     let mouse_btn = if let Some(btn) = cam.aim_button {
@@ -229,6 +248,10 @@ fn aim(
     };
 
     if mouse_btn || gamepad_btn {
+        // rotate player or target to face direction he is aiming
+        let Ok(mut player_transform) = player_q.get_single_mut() else { return };
+        player_transform.look_to(cam_transform.forward(), Vec3::Y);
+
         let desired_zoom = cam.zoom.min * cam.aim_zoom;
 
         // radius_copy is used for restoring the radius (zoom) to it's
@@ -260,6 +283,12 @@ fn aim(
             }
         }
     }
+}
+
+// only run toggle_x_offset if `offset_enabled` is true
+fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else { return false };
+    cam.offset_enabled
 }
 
 // inverts the x offset. Example: left shoulder view -> right shoulder view & vice versa
