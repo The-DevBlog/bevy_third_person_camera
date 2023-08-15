@@ -247,19 +247,16 @@ fn aim(
             cam.zoom.radius -= zoom_factor;
         }
     } else {
-        if let Some(radius) = cam.zoom.radius_copy {
-            let zoom_factor = (cam.zoom.radius_copy.unwrap() / cam.aim_zoom)
-                * cam.aim_speed
-                * time.delta_seconds();
+        if let Some(radius_copy) = cam.zoom.radius_copy {
+            let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
 
             // stop zooming out if current radius is greater than original radius
-            if cam.zoom.radius >= radius || cam.zoom.radius + zoom_factor >= radius {
-                cam.zoom.radius = radius;
+            if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
+                cam.zoom.radius = radius_copy;
                 cam.zoom.radius_copy = None;
             } else {
-                cam.zoom.radius += (cam.zoom.radius_copy.unwrap() / cam.aim_zoom)
-                    * cam.aim_speed
-                    * time.delta_seconds();
+                cam.zoom.radius +=
+                    (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
             }
         }
     }
