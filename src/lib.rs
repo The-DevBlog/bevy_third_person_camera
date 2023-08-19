@@ -27,7 +27,7 @@ impl Plugin for ThirdPersonCameraPlugin {
                 aim.run_if(aim_condition),
                 sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
                 toggle_x_offset.run_if(toggle_x_offset_condition),
-                toggle_cursor.run_if(toggle_cursor_enabled),
+                toggle_cursor.run_if(toggle_cursor_condition),
             ),
         );
     }
@@ -48,7 +48,7 @@ impl Plugin for ThirdPersonCameraPlugin {
 #[derive(Component)]
 pub struct ThirdPersonCamera {
     pub aim_enabled: bool,
-    pub aim_button: Option<MouseButton>,
+    pub aim_button: MouseButton,
     pub aim_speed: f32,
     pub aim_zoom: f32,
     pub cursor_lock_key: KeyCode,
@@ -59,8 +59,10 @@ pub struct ThirdPersonCamera {
     pub mouse_sensitivity: f32,
     pub offset_enabled: bool,
     pub offset: Offset,
-    pub offset_toggle_key: Option<KeyCode>,
+    pub offset_toggle_enabled: bool,
+    pub offset_toggle_key: KeyCode,
     pub offset_toggle_speed: f32,
+    pub zoom_enabled: bool,
     pub zoom: Zoom,
     pub zoom_sensitivity: f32,
 }
@@ -69,7 +71,7 @@ impl Default for ThirdPersonCamera {
     fn default() -> Self {
         ThirdPersonCamera {
             aim_enabled: false,
-            aim_button: Some(MouseButton::Right),
+            aim_button: MouseButton::Right,
             aim_speed: 3.0,
             aim_zoom: 0.7,
             cursor_lock_key: KeyCode::Space,
@@ -80,13 +82,18 @@ impl Default for ThirdPersonCamera {
             mouse_sensitivity: 1.0,
             offset_enabled: false,
             offset: Offset::new(0.5, 0.4),
+            offset_toggle_enabled: false,
             offset_toggle_speed: 5.0,
-            offset_toggle_key: None,
+            offset_toggle_key: KeyCode::E,
+            zoom_enabled: true,
             zoom: Zoom::new(1.5, 3.0),
             zoom_sensitivity: 1.0,
         }
     }
 }
+
+#[derive(Resource)]
+pub struct GamepadResource(pub Gamepad);
 
 /// Sets the zoom bounds (min & max)
 pub struct Zoom {
@@ -125,8 +132,8 @@ impl Offset {
     }
 }
 
-#[derive(Resource)]
-pub struct GamepadResource(pub Gamepad);
+// #[derive(Resource)]
+// pub struct GamepadResource(pub Gamepad);
 
 /// Customizable gamepad settings
 ///
@@ -140,8 +147,8 @@ pub struct GamepadResource(pub Gamepad);
 ///    commands.spawn((
 ///        ThirdPersonCamera {
 ///            gamepad_settings: CustomGamepadSettings {
-///                aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
-///                offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)),
+///                aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
+///                offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
 ///                x_sensitivity: 7.0,
 ///                y_sensitivity: 4.0,
 ///                zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
@@ -155,8 +162,8 @@ pub struct GamepadResource(pub Gamepad);
 /// ```
 #[derive(Component)]
 pub struct CustomGamepadSettings {
-    pub aim_button: Option<GamepadButton>,
-    pub offset_toggle_button: Option<GamepadButton>,
+    pub aim_button: GamepadButton,
+    pub offset_toggle_button: GamepadButton,
     pub x_sensitivity: f32,
     pub y_sensitivity: f32,
     pub zoom_in_button: GamepadButton,
@@ -167,8 +174,8 @@ impl Default for CustomGamepadSettings {
     fn default() -> Self {
         let gamepad = Gamepad::new(0);
         Self {
-            aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
-            offset_toggle_button: None,
+            aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
+            offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
@@ -237,19 +244,9 @@ fn aim(
     let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else { return };
 
     // check if aim button was pressed
-    let mouse_btn = if let Some(btn) = cam.aim_button {
-        mouse.pressed(btn)
-    } else {
-        false
-    };
+    let aim_btn = mouse.pressed(cam.aim_button) || btns.pressed(cam.gamepad_settings.aim_button);
 
-    let gamepad_btn = if let Some(btn) = cam.gamepad_settings.aim_button {
-        btns.pressed(btn)
-    } else {
-        false
-    };
-
-    if mouse_btn || gamepad_btn {
+    if aim_btn {
         // rotate player or target to face direction he is aiming
         let Ok(mut player_transform) = player_q.get_single_mut() else { return };
         player_transform.look_to(cam_transform.forward(), Vec3::Y);
@@ -287,10 +284,15 @@ fn aim(
     }
 }
 
-// only run toggle_x_offset if `offset_enabled` is true
+pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else { return false };
+    cam.zoom_enabled
+}
+
+// only run toggle_x_offset if `offset_toggle_enabled` is true
 fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return false };
-    cam.offset_enabled
+    cam.offset_toggle_enabled
 }
 
 // inverts the x offset. Example: left shoulder view -> right shoulder view & vice versa
@@ -302,22 +304,11 @@ fn toggle_x_offset(
 ) {
     let Ok(mut cam) = cam_q.get_single_mut() else { return };
 
-    // check if gamepad toggle was pressed
-    let gamepad_toggle_key_pressed =
-        if let Some(gamepad_toggle_key) = cam.gamepad_settings.offset_toggle_button {
-            btns.just_pressed(gamepad_toggle_key)
-        } else {
-            false
-        };
+    // check if toggle btn was pressed
+    let toggle_btn = keys.just_pressed(cam.offset_toggle_key)
+        || btns.just_pressed(cam.gamepad_settings.offset_toggle_button);
 
-    // check if keyboard toggle was pressed
-    let offset_toggle_key_pressed = if let Some(toggle_key) = cam.offset_toggle_key {
-        keys.just_pressed(toggle_key)
-    } else {
-        false
-    };
-
-    if offset_toggle_key_pressed || gamepad_toggle_key_pressed {
+    if toggle_btn {
         // Switch direction by inverting the offset_flag
         cam.offset.is_transitioning = !cam.offset.is_transitioning;
     }
@@ -356,7 +347,7 @@ fn toggle_cursor(
 }
 
 // checks if the toggle cursor functionality is enabled
-fn toggle_cursor_enabled(cam_q: Query<&ThirdPersonCamera>) -> bool {
+fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return true };
     cam.enable_cursor_lock_toggle
 }
