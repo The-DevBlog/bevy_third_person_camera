@@ -15,8 +15,7 @@ impl Plugin for GamePadPlugin {
             Update,
             (
                 connections,
-                orbit_gamepad.run_if(resource_exists::<GamepadResource>()),
-                zoom_gamepad.run_if(resource_exists::<GamepadResource>()),
+                (orbit_gamepad, zoom_gamepad).run_if(resource_exists::<GamepadResource>()),
             ),
         );
     }

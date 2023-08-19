@@ -140,6 +140,8 @@ pub struct GamepadResource(pub Gamepad);
 ///    commands.spawn((
 ///        ThirdPersonCamera {
 ///            gamepad_settings: CustomGamepadSettings {
+///                aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
+///                offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)),
 ///                x_sensitivity: 7.0,
 ///                y_sensitivity: 4.0,
 ///                zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
