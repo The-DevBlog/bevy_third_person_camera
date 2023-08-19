@@ -92,9 +92,6 @@ impl Default for ThirdPersonCamera {
     }
 }
 
-#[derive(Resource)]
-pub struct GamepadResource(pub Gamepad);
-
 /// Sets the zoom bounds (min & max)
 pub struct Zoom {
     pub min: f32,
@@ -132,8 +129,8 @@ impl Offset {
     }
 }
 
-// #[derive(Resource)]
-// pub struct GamepadResource(pub Gamepad);
+#[derive(Resource)]
+pub struct GamepadResource(pub Gamepad);
 
 /// Customizable gamepad settings
 ///
