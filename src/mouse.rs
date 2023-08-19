@@ -6,7 +6,7 @@ use bevy::{
     window::PrimaryWindow,
 };
 
-use crate::ThirdPersonCamera;
+use crate::{zoom_condition, ThirdPersonCamera};
 
 pub struct MousePlugin;
 
@@ -14,7 +14,11 @@ impl Plugin for MousePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (orbit_mouse.run_if(orbit_condition), zoom_mouse).chain(),
+            (
+                orbit_mouse.run_if(orbit_condition),
+                zoom_mouse.run_if(zoom_condition),
+            )
+                .chain(),
         );
     }
 }

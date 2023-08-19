@@ -31,7 +31,6 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
 }
 
 fn spawn_camera(mut commands: Commands) {
-    let gamepad = Gamepad::new(0);
     let camera = (
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -42,15 +41,10 @@ fn spawn_camera(mut commands: Commands) {
             aim_speed: 3.0, // default
             aim_zoom: 0.7,  // default
             offset_enabled: true,
-            offset_toggle_key: Some(KeyCode::T),
+            offset_toggle_enabled: true,
+            gamepad_settings: CustomGamepadSettings { ..default() },
+            zoom_enabled: true,        // default
             zoom: Zoom::new(1.5, 3.0), // default
-            gamepad_settings: CustomGamepadSettings {
-                offset_toggle_button: Some(GamepadButton::new(
-                    gamepad,
-                    GamepadButtonType::DPadRight,
-                )),
-                ..default()
-            },
             ..default()
         },
     );
