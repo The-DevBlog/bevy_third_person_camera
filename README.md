@@ -147,7 +147,7 @@ commands.spawn((
 | ---- | ------------------------ |
 | 0.11 | 0.1.4                    |
 
-Refer to the [Changelog](Changelog.md) to view any breaking changes.
+Refer to the [Changelog](Changelog.md) to view breaking changes and updates.
 
 ## License
 
