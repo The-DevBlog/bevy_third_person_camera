@@ -26,7 +26,7 @@ impl Plugin for MousePlugin {
 // only run the orbit system if the cursor lock is disabled
 fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return true };
-    return cam.lock_cursor;
+    return cam.cursor_lock_active;
 }
 
 // heavily referenced https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html

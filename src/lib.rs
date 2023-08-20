@@ -51,11 +51,11 @@ pub struct ThirdPersonCamera {
     pub aim_button: MouseButton,
     pub aim_speed: f32,
     pub aim_zoom: f32,
+    pub cursor_lock_toggle_enabled: bool,
+    pub cursor_lock_active: bool,
     pub cursor_lock_key: KeyCode,
-    pub enable_cursor_lock_toggle: bool,
     pub focus: Vec3,
     pub gamepad_settings: CustomGamepadSettings,
-    pub lock_cursor: bool,
     pub mouse_sensitivity: f32,
     pub offset_enabled: bool,
     pub offset: Offset,
@@ -75,10 +75,10 @@ impl Default for ThirdPersonCamera {
             aim_speed: 3.0,
             aim_zoom: 0.7,
             cursor_lock_key: KeyCode::Space,
-            enable_cursor_lock_toggle: true,
+            cursor_lock_toggle_enabled: true,
             focus: Vec3::ZERO,
             gamepad_settings: CustomGamepadSettings::default(),
-            lock_cursor: true,
+            cursor_lock_active: true,
             mouse_sensitivity: 1.0,
             offset_enabled: false,
             offset: Offset::new(0.5, 0.4),
@@ -330,11 +330,11 @@ fn toggle_cursor(
     let Ok(mut cam) = cam_q.get_single_mut() else { return };
 
     if keys.just_pressed(cam.cursor_lock_key) {
-        cam.lock_cursor = !cam.lock_cursor;
+        cam.cursor_lock_active = !cam.cursor_lock_active;
     }
 
     let mut window = window_q.get_single_mut().unwrap();
-    if cam.lock_cursor {
+    if cam.cursor_lock_active {
         window.cursor.grab_mode = CursorGrabMode::Locked;
         window.cursor.visible = false;
     } else {
@@ -346,5 +346,5 @@ fn toggle_cursor(
 // checks if the toggle cursor functionality is enabled
 fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return true };
-    cam.enable_cursor_lock_toggle
+    cam.cursor_lock_toggle_enabled
 }
