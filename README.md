@@ -147,6 +147,8 @@ commands.spawn((
 | ---- | ------------------------ |
 | 0.11 | 0.1.4                    |
 
+Refer to the [Changelog](Changelog.md) to view any breaking changes.
+
 ## License
 
 - MIT License (LICENSE-MIT or http://opensource.org/licenses/MIT)
