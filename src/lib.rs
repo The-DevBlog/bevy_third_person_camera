@@ -82,7 +82,7 @@ impl Default for ThirdPersonCamera {
             gamepad_settings: CustomGamepadSettings::default(),
             cursor_lock_active: true,
             mouse_sensitivity: 1.0,
-            mouse_orbit_on_button_enabled: true,
+            mouse_orbit_on_button_enabled: false,
             mouse_orbit_button: MouseButton::Right,
             offset_enabled: false,
             offset: Offset::new(0.5, 0.4),
