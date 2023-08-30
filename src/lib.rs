@@ -83,7 +83,7 @@ impl Default for ThirdPersonCamera {
             cursor_lock_active: true,
             mouse_sensitivity: 1.0,
             mouse_orbit_button_enabled: false,
-            mouse_orbit_button: MouseButton::Right,
+            mouse_orbit_button: MouseButton::Middle,
             offset_enabled: false,
             offset: Offset::new(0.5, 0.4),
             offset_toggle_enabled: false,
