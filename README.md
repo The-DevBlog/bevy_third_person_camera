@@ -147,7 +147,7 @@ commands.spawn((
 | Aim                | Right Mouse Button  | Left Trigger | No                 |
 | Toggle Offset      | E                   | D Pad Right  | No                 |
 | Cursor Lock/Unlock | Space               | n/a          | Yes                |
-| Mouse Orbit Button | Middle Mouse Button | Left Bumper  | No                 |
+| Orbit Button       | Middle Mouse Button | Left Bumper  | No                 |
 
 ## Bevy Version Compatibility
 
