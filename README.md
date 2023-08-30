@@ -98,11 +98,6 @@ The cursor lock feature allows the mouse cursor to toggle between a locked, hidd
 
 Orbiting is enabled by default. However, you can set the `mouse_orbit_button_enabled` setting to `true` and the orbiting will only be active while the `mouse_orbit_button` is pressed.
 
-```rust
-mouse_orbit_button_enabled: true, // default is false
-mouse_orbit_button: MouseButton::Middle // default
-```
-
 ## Custom Settings
 
 Most settings can be overridden: 
