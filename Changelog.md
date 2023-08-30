@@ -2,7 +2,7 @@
 
 ## New Features
 
-- Conditional Orbit
+- Conditional Orbit - [SGoerzen](https://github.com/SGoerzen)
   - Orbiting can now be activated using a custom mouse button
   - Default is off, so orbiting will work like normal
 
