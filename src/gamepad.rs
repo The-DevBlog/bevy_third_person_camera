@@ -77,6 +77,7 @@ pub fn zoom_gamepad(
 pub fn orbit_gamepad(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
+    btns: Res<Input<GamepadButton>>,
     axis: Res<Axis<GamepadAxis>>,
     gamepad_res: Option<Res<GamepadResource>>,
 ) {
@@ -87,43 +88,47 @@ pub fn orbit_gamepad(
         return;
     };
 
+    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else { return };
+
+    if cam.mouse_orbit_button_enabled && !btns.pressed(cam.gamepad_settings.mouse_orbit_button) {
+        return;
+    }
+
     let x_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickX);
     let y_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickY);
 
-    for (cam, mut cam_transform) in cam_q.iter_mut() {
-        let deadzone = 0.5;
-        let mut rotation = Vec2::ZERO;
-        if let (Some(x), Some(y)) = (axis.get(x_axis), axis.get(y_axis)) {
-            if x.abs() > deadzone || y.abs() > deadzone {
-                rotation = Vec2::new(x, y);
-            }
+    let deadzone = 0.5;
+    let mut rotation = Vec2::ZERO;
+    if let (Some(x), Some(y)) = (axis.get(x_axis), axis.get(y_axis)) {
+        if x.abs() > deadzone || y.abs() > deadzone {
+            rotation = Vec2::new(x, y);
         }
-
-        if rotation.length_squared() > 0.0 {
-            let window = window_q.get_single().unwrap();
-            let delta_x = {
-                let delta = rotation.x / window.width()
-                    * std::f32::consts::PI
-                    * 2.0
-                    * cam.gamepad_settings.x_sensitivity;
-                delta
-            };
-            let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.y_sensitivity;
-            let yaw = Quat::from_rotation_y(-delta_x);
-            let pitch = Quat::from_rotation_x(-delta_y);
-            cam_transform.rotation = yaw * cam_transform.rotation; // rotate around global y axis
-
-            let new_rotation = cam_transform.rotation * pitch;
-
-            // check if new rotation will cause camera to go beyond the 180 degree vertical bounds
-            let up_vector = new_rotation * Vec3::Y;
-            if up_vector.y > 0.0 {
-                cam_transform.rotation = new_rotation;
-            }
-        }
-
-        let rot_matrix = Mat3::from_quat(cam_transform.rotation);
-        cam_transform.translation =
-            cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
     }
+
+    if rotation.length_squared() > 0.0 {
+        let window = window_q.get_single().unwrap();
+        let delta_x = {
+            let delta = rotation.x / window.width()
+                * std::f32::consts::PI
+                * 2.0
+                * cam.gamepad_settings.x_sensitivity;
+            delta
+        };
+        let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.y_sensitivity;
+        let yaw = Quat::from_rotation_y(-delta_x);
+        let pitch = Quat::from_rotation_x(-delta_y);
+        cam_transform.rotation = yaw * cam_transform.rotation; // rotate around global y axis
+
+        let new_rotation = cam_transform.rotation * pitch;
+
+        // check if new rotation will cause camera to go beyond the 180 degree vertical bounds
+        let up_vector = new_rotation * Vec3::Y;
+        if up_vector.y > 0.0 {
+            cam_transform.rotation = new_rotation;
+        }
+    }
+
+    let rot_matrix = Mat3::from_quat(cam_transform.rotation);
+    cam_transform.translation =
+        cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
 }

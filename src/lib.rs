@@ -149,6 +149,7 @@ pub struct GamepadResource(pub Gamepad);
 ///        ThirdPersonCamera {
 ///            gamepad_settings: CustomGamepadSettings {
 ///                aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
+///                mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
 ///                offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
 ///                x_sensitivity: 7.0,
 ///                y_sensitivity: 4.0,
@@ -164,6 +165,7 @@ pub struct GamepadResource(pub Gamepad);
 #[derive(Component)]
 pub struct CustomGamepadSettings {
     pub aim_button: GamepadButton,
+    pub mouse_orbit_button: GamepadButton,
     pub offset_toggle_button: GamepadButton,
     pub x_sensitivity: f32,
     pub y_sensitivity: f32,
@@ -176,6 +178,7 @@ impl Default for CustomGamepadSettings {
         let gamepad = Gamepad::new(0);
         Self {
             aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
+            mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
             offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,

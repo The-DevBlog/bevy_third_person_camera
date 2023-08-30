@@ -130,6 +130,7 @@ commands.spawn((
         zoom_sensitivity: 1.0,
         gamepad_settings: CustomGamepadSettings {
             aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
+            mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
             x_sensitivity: 7.0,
             y_sensitivity: 4.0,
             offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)), // default is None
@@ -151,13 +152,13 @@ commands.spawn((
 | Aim                | Right Mouse Button  | Left Trigger | No                 |
 | Toggle Offset      | E                   | D Pad Right  | No                 |
 | Cursor Lock/Unlock | Space               | n/a          | Yes                |
-| Mouse Orbit Button | Middle Mouse Button | n/a          | No                 |
+| Mouse Orbit Button | Middle Mouse Button | Left Bumper  | No                 |
 
 ## Bevy Version Compatibility
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.11 | 0.1.4                    |
+| 0.11 | 0.1.5                    |
 
 Refer to the [Changelog](Changelog.md) to view breaking changes and updates.
 
