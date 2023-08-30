@@ -94,6 +94,15 @@ The cursor lock feature allows the mouse cursor to toggle between a locked, hidd
 
 ![cursor lock demo](assets/cursorLockDemo.gif)
 
+#### Mouse Orbit Button
+
+By default, when orbit feature is enabled, the camera rotation is always active. 
+If you wish to only rotate while pressing a specific button, you can use specific parameters. If `mouse_orbit_button_enabled` is set to `true`, the orbit rotation will be done when pressing the `mouse_orbit_button` (default: `MouseButton::Middle`).
+```rust
+mouse_orbit_button_enabled: true,
+mouse_orbit_button: MouseButton::Middle
+```
+
 ## Custom Settings
 
 Most settings can be overridden: 
@@ -111,6 +120,8 @@ commands.spawn((
         cursor_lock_active: true,
         cursor_lock_key: KeyCode::Space,
         mouse_sensitivity: 2.0,
+        mouse_orbit_button_enabled: false,
+        mouse_orbit_button: MouseButton::Middle,
         offset_enabled: false,
         offset: Offset::new(0.5, 0.4),
         offset_toggle_speed: 5.0,
@@ -133,13 +144,14 @@ commands.spawn((
 
 ## Default Controls
 
-|                    | Mouse/Keyboard     | Gamepad      |
-| ------------------ | ------------------ | ------------ |
-| Zoom In            | Scroll Up          | D Pad Up     |
-| Zoom Out           | Scroll Down        | D Pad Down   |
-| Aim                | Right Mouse Button | Left Trigger |
-| Toggle Offset      | E                  | D Pad Right  |
-| Cursor Lock/Unlock | Space              | n/a          |
+|                    | Mouse/Keyboard      | Gamepad      |
+|--------------------|---------------------| ------------ |
+| Zoom In            | Scroll Up           | D Pad Up     |
+| Zoom Out           | Scroll Down         | D Pad Down   |
+| Aim                | Right Mouse Button  | Left Trigger |
+| Toggle Offset      | E                   | D Pad Right  |
+| Cursor Lock/Unlock | Space               | n/a          |
+| Mouse Orbit Button | Middle Mouse Button | n/a          |
 
 ## Bevy Version Compatibility
 
