@@ -43,7 +43,7 @@ pub fn orbit_mouse(
 
     let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else { return };
 
-    if cam.mouse_orbit_on_button_enabled && !mouse.pressed(cam.mouse_orbit_button) {
+    if cam.mouse_orbit_button_enabled && !mouse.pressed(cam.mouse_orbit_button) {
         return;
     }
 
