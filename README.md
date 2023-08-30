@@ -94,13 +94,13 @@ The cursor lock feature allows the mouse cursor to toggle between a locked, hidd
 
 ![cursor lock demo](assets/cursorLockDemo.gif)
 
-#### Mouse Orbit Button
+### Orbit
 
-By default, when orbit feature is enabled, the camera rotation is always active. 
-If you wish to only rotate while pressing a specific button, you can use specific parameters. If `mouse_orbit_button_enabled` is set to `true`, the orbit rotation will be done when pressing the `mouse_orbit_button` (default: `MouseButton::Middle`).
+Orbiting is enabled by default. However, you can set the `mouse_orbit_button_enabled` setting to `true` and the orbiting will only be active while the `mouse_orbit_button` is pressed.
+
 ```rust
-mouse_orbit_button_enabled: true,
-mouse_orbit_button: MouseButton::Middle
+mouse_orbit_button_enabled: true, // default is false
+mouse_orbit_button: MouseButton::Middle // default
 ```
 
 ## Custom Settings
@@ -144,14 +144,14 @@ commands.spawn((
 
 ## Default Controls
 
-|                    | Mouse/Keyboard      | Gamepad      |
-|--------------------|---------------------| ------------ |
-| Zoom In            | Scroll Up           | D Pad Up     |
-| Zoom Out           | Scroll Down         | D Pad Down   |
-| Aim                | Right Mouse Button  | Left Trigger |
-| Toggle Offset      | E                   | D Pad Right  |
-| Cursor Lock/Unlock | Space               | n/a          |
-| Mouse Orbit Button | Middle Mouse Button | n/a          |
+|                    | Mouse/Keyboard      | Gamepad      | Enabled by Default |
+| ------------------ | ------------------- | ------------ | ------------------ |
+| Zoom In            | Scroll Up           | D Pad Up     | Yes                |
+| Zoom Out           | Scroll Down         | D Pad Down   | Yes                |
+| Aim                | Right Mouse Button  | Left Trigger | No                 |
+| Toggle Offset      | E                   | D Pad Right  | No                 |
+| Cursor Lock/Unlock | Space               | n/a          | Yes                |
+| Mouse Orbit Button | Middle Mouse Button | n/a          | No                 |
 
 ## Bevy Version Compatibility
 
