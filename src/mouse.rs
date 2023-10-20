@@ -16,7 +16,7 @@ impl Plugin for MousePlugin {
             Update,
             (
                 orbit_mouse.run_if(orbit_condition),
-                zoom_mouse.run_if(zoom_condition && orbit_condition),
+                zoom_mouse.run_if(zoom_condition),
             )
                 .chain(),
         );
