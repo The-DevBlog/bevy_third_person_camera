@@ -1,3 +1,13 @@
+# v0.1.6
+
+## Minor Changes
+
+- Updated Bevy to latest version 0.11.3
+
+## Bug Fixes
+
+- Added an additional zoom condition so that zooming does not occur when the cursor lock is enabled - [Matthewwyndham](https://github.com/matthewwyndham)
+
 # v0.1.5
 
 ## New Features

@@ -153,7 +153,7 @@ commands.spawn((
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.11 | 0.1.5                    |
+| 0.11 | 0.1.6                    |
 
 Refer to the [Changelog](Changelog.md) to view breaking changes and updates.
 
