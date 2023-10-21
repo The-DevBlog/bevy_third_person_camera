@@ -290,7 +290,7 @@ fn aim(
 
 pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
     let Ok(cam) = cam_q.get_single() else { return false };
-    cam.zoom_enabled
+    return cam.zoom_enabled && cam.cursor_lock_active;
 }
 
 // only run toggle_x_offset if `offset_toggle_enabled` is true
