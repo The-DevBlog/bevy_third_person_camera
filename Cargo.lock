@@ -886,7 +886,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_third_person_camera"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "bevy",
 ]
