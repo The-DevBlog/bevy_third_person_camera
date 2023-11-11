@@ -1,3 +1,6 @@
+# v0.1.7
+- Updated Bevy to latest version 0.12.0
+
 # v0.1.6
 
 ## Minor Changes

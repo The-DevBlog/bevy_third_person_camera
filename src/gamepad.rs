@@ -26,7 +26,7 @@ fn connections(
     gamepad_res: Option<Res<GamepadResource>>,
     mut gamepad_evr: EventReader<GamepadConnectionEvent>,
 ) {
-    for ev in gamepad_evr.iter() {
+    for ev in gamepad_evr.read() {
         match &ev.connection {
             Connected(_info) => {
                 // if no gamepad is setup yet, use this one
