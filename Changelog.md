@@ -1,6 +1,6 @@
 # v0.1.8
 - Updated Bevy to latest version 0.12.1
-- Updated Bevy dependency to disable bevy default features and add full feature set
+- Updated Bevy dependency to disable bevy default features and add full feature set [shenjiangqiu](https://github.com/shenjiangqiu)
 
 # v0.1.7
 - Updated Bevy to latest version 0.12.0
