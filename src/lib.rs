@@ -253,7 +253,7 @@ fn aim(
     if aim_btn {
         // rotate player or target to face direction he is aiming
         let Ok(mut player_transform) = player_q.get_single_mut() else { return };
-        player_transform.look_to(cam_transform.forward().into(), Vec3::Y);
+        player_transform.look_to(*cam_transform.forward(), Vec3::Y);
 
         let desired_zoom = cam.zoom.min * cam.aim_zoom;
 
