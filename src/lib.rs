@@ -88,7 +88,7 @@ impl Default for ThirdPersonCamera {
             offset: Offset::new(0.5, 0.4),
             offset_toggle_enabled: false,
             offset_toggle_speed: 5.0,
-            offset_toggle_key: KeyCode::E,
+            offset_toggle_key: KeyCode::KeyE,
             zoom_enabled: true,
             zoom: Zoom::new(1.5, 3.0),
             zoom_sensitivity: 1.0,
@@ -240,9 +240,9 @@ fn aim(
         (&mut ThirdPersonCamera, &Transform),
         (With<ThirdPersonCamera>, Without<ThirdPersonCameraTarget>),
     >,
-    mouse: Res<Input<MouseButton>>,
+    mouse: Res<ButtonInput<MouseButton>>,
     mut player_q: Query<&mut Transform, With<ThirdPersonCameraTarget>>,
-    btns: Res<Input<GamepadButton>>,
+    btns: Res<ButtonInput<GamepadButton>>,
     time: Res<Time>,
 ) {
     let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else { return };
@@ -253,7 +253,7 @@ fn aim(
     if aim_btn {
         // rotate player or target to face direction he is aiming
         let Ok(mut player_transform) = player_q.get_single_mut() else { return };
-        player_transform.look_to(cam_transform.forward(), Vec3::Y);
+        player_transform.look_to(cam_transform.forward().into(), Vec3::Y);
 
         let desired_zoom = cam.zoom.min * cam.aim_zoom;
 
@@ -302,9 +302,9 @@ fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCa
 // inverts the x offset. Example: left shoulder view -> right shoulder view & vice versa
 fn toggle_x_offset(
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
-    btns: Res<Input<GamepadButton>>,
+    btns: Res<ButtonInput<GamepadButton>>,
 ) {
     let Ok(mut cam) = cam_q.get_single_mut() else { return };
 
@@ -331,7 +331,7 @@ fn toggle_x_offset(
 
 fn toggle_cursor(
     mut cam_q: Query<&mut ThirdPersonCamera>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut window_q: Query<&mut Window, With<PrimaryWindow>>,
 ) {
     let Ok(mut cam) = cam_q.get_single_mut() else { return };
