@@ -65,7 +65,7 @@ fn spawn_world(
 
     let light = PointLightBundle {
         point_light: PointLight {
-            intensity: 1500.0,
+            intensity: 1500.0 * 1000.0,
             ..default()
         },
         transform: Transform::from_xyz(0.0, 5.0, 0.0),
