@@ -209,8 +209,12 @@ fn sync_player_camera(
     player_q: Query<&Transform, With<ThirdPersonCameraTarget>>,
     mut cam_q: Query<(&mut ThirdPersonCamera, &mut Transform), Without<ThirdPersonCameraTarget>>,
 ) {
-    let Ok(player) = player_q.get_single() else { return };
-    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else { return };
+    let Ok(player) = player_q.get_single() else {
+        return;
+    };
+    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
+        return;
+    };
 
     // Calculate the desired camera translation based on focus, radius, and xy_offset
     let rotation_matrix = Mat3::from_quat(cam_transform.rotation);
@@ -231,7 +235,9 @@ fn sync_player_camera(
 
 // only run aiming logic if `aim_enabled` is true
 fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else { return false };
+    let Ok(cam) = cam_q.get_single() else {
+        return false;
+    };
     cam.aim_enabled
 }
 
@@ -245,14 +251,18 @@ fn aim(
     btns: Res<ButtonInput<GamepadButton>>,
     time: Res<Time>,
 ) {
-    let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else { return };
+    let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else {
+        return;
+    };
 
     // check if aim button was pressed
     let aim_btn = mouse.pressed(cam.aim_button) || btns.pressed(cam.gamepad_settings.aim_button);
 
     if aim_btn {
         // rotate player or target to face direction he is aiming
-        let Ok(mut player_transform) = player_q.get_single_mut() else { return };
+        let Ok(mut player_transform) = player_q.get_single_mut() else {
+            return;
+        };
         player_transform.look_to(*cam_transform.forward(), Vec3::Y);
 
         let desired_zoom = cam.zoom.min * cam.aim_zoom;
@@ -289,13 +299,17 @@ fn aim(
 }
 
 pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else { return false };
+    let Ok(cam) = cam_q.get_single() else {
+        return false;
+    };
     return cam.zoom_enabled && cam.cursor_lock_active;
 }
 
 // only run toggle_x_offset if `offset_toggle_enabled` is true
 fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else { return false };
+    let Ok(cam) = cam_q.get_single() else {
+        return false;
+    };
     cam.offset_toggle_enabled
 }
 
@@ -306,7 +320,9 @@ fn toggle_x_offset(
     time: Res<Time>,
     btns: Res<ButtonInput<GamepadButton>>,
 ) {
-    let Ok(mut cam) = cam_q.get_single_mut() else { return };
+    let Ok(mut cam) = cam_q.get_single_mut() else {
+        return;
+    };
 
     // check if toggle btn was pressed
     let toggle_btn = keys.just_pressed(cam.offset_toggle_key)
@@ -334,7 +350,9 @@ fn toggle_cursor(
     keys: Res<ButtonInput<KeyCode>>,
     mut window_q: Query<&mut Window, With<PrimaryWindow>>,
 ) {
-    let Ok(mut cam) = cam_q.get_single_mut() else { return };
+    let Ok(mut cam) = cam_q.get_single_mut() else {
+        return;
+    };
 
     if keys.just_pressed(cam.cursor_lock_key) {
         cam.cursor_lock_active = !cam.cursor_lock_active;
@@ -352,6 +370,8 @@ fn toggle_cursor(
 
 // checks if the toggle cursor functionality is enabled
 fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
-    let Ok(cam) = cam_q.get_single() else { return true };
+    let Ok(cam) = cam_q.get_single() else {
+        return true;
+    };
     cam.cursor_lock_toggle_enabled
 }
