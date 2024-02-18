@@ -33,7 +33,7 @@ fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
 pub fn orbit_mouse(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
-    mouse: Res<Input<MouseButton>>,
+    mouse: Res<ButtonInput<MouseButton>>,
     mut mouse_evr: EventReader<MouseMotion>,
 ) {
     let mut rotation = Vec2::ZERO;

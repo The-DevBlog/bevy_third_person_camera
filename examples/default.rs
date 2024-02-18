@@ -48,8 +48,8 @@ fn spawn_world(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane::from_size(15.0))),
-        material: materials.add(Color::DARK_GREEN.into()),
+        mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
+        material: materials.add(Color::DARK_GREEN),
         ..default()
     };
 
@@ -68,7 +68,7 @@ fn spawn_world(
 
 fn player_movement(
     time: Res<Time>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut player_q: Query<(&mut Transform, &Speed), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ) {
@@ -81,23 +81,23 @@ fn player_movement(
         let mut direction = Vec3::ZERO;
 
         // forward
-        if keys.pressed(KeyCode::W) {
-            direction += cam.forward();
+        if keys.pressed(KeyCode::KeyW) {
+            direction += *cam.forward();
         }
 
         // back
-        if keys.pressed(KeyCode::S) {
-            direction += cam.back();
+        if keys.pressed(KeyCode::KeyS) {
+            direction += *cam.back();
         }
 
         // left
-        if keys.pressed(KeyCode::A) {
-            direction += cam.left();
+        if keys.pressed(KeyCode::KeyA) {
+            direction += *cam.left();
         }
 
         // right
-        if keys.pressed(KeyCode::D) {
-            direction += cam.right();
+        if keys.pressed(KeyCode::KeyD) {
+            direction += *cam.right();
         }
 
         direction.y = 0.0;
