@@ -3,6 +3,15 @@
 ## <ins>!Breaking Changes!</ins>
 
 - Removed 'focus' field as it had zero effect
+  
+## New Features
+
+- Third Person Controller
+  - A new component that will add basic controls to the ThirdPersonCameraTarget.
+  - WASD movement controls 
+  - Sprint Key/Button
+  - Customizable layout
+  - As always, full Gamepad support
 
 # v0.1.9
 

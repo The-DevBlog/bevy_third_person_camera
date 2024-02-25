@@ -1,11 +1,10 @@
-use std::f32::consts::PI;
-
 use crate::{camera::GamepadResource, camera::ThirdPersonCamera};
 use bevy::{
     input::gamepad::{GamepadConnection::*, *},
     prelude::*,
     window::PrimaryWindow,
 };
+use std::f32::consts::PI;
 
 pub struct GamePadPlugin;
 
@@ -48,10 +47,10 @@ pub fn zoom_gamepad(
     gamepad_res: Option<Res<GamepadResource>>,
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
 ) {
-    let gamepad = if let Some(gp) = gamepad_res {
-        gp.0
-    } else {
-        return;
+    // return gamepad if one is connected
+    let gamepad = match gamepad_res {
+        Some(gp) => gp.0,
+        None => return,
     };
 
     if let Ok(mut cam) = cam_q.get_single_mut() {

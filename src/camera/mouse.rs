@@ -1,10 +1,9 @@
-use std::f32::consts::PI;
-
 use bevy::{
     input::mouse::{MouseMotion, MouseWheel},
     prelude::*,
     window::PrimaryWindow,
 };
+use std::f32::consts::PI;
 
 use crate::{camera::shared::zoom_condition, camera::ThirdPersonCamera};
 
@@ -21,14 +20,6 @@ impl Plugin for MousePlugin {
                 .chain(),
         );
     }
-}
-
-// only run the orbit system if the cursor lock is disabled
-fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
-        return true;
-    };
-    return cam.cursor_lock_active;
 }
 
 // heavily referenced https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html
@@ -92,4 +83,12 @@ fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut Thi
             cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
         }
     }
+}
+
+// only run the orbit system if the cursor lock is disabled
+fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
+    let Ok(cam) = cam_q.get_single() else {
+        return true;
+    };
+    return cam.cursor_lock_active;
 }

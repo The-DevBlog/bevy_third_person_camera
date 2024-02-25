@@ -11,9 +11,6 @@ fn main() {
 #[derive(Component)]
 struct Player;
 
-#[derive(Component)]
-struct Speed(f32);
-
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let player = (
         SceneBundle {
@@ -23,8 +20,7 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
         },
         Player,
         ThirdPersonCameraTarget,
-        ThirdPersonController,
-        Speed(2.5),
+        ThirdPersonController::default(), // add third person controller
     );
 
     commands.spawn(player);

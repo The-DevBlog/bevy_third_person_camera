@@ -1,11 +1,10 @@
-use bevy::{
-    prelude::*,
-    window::{CursorGrabMode, PrimaryWindow},
-};
-
 use crate::{
     camera::gamepad::orbit_gamepad, camera::mouse::orbit_mouse, camera::ThirdPersonCamera,
     camera::ThirdPersonCameraTarget,
+};
+use bevy::{
+    prelude::*,
+    window::{CursorGrabMode, PrimaryWindow},
 };
 
 pub struct SharedPlugin;
@@ -49,14 +48,6 @@ fn sync_player_camera(
 
     // Update the camera translation
     cam_transform.translation = desired_translation + player.translation;
-}
-
-// only run aiming logic if `aim_enabled` is true
-fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
-        return false;
-    };
-    cam.aim_enabled
 }
 
 fn aim(
@@ -114,21 +105,6 @@ fn aim(
             }
         }
     }
-}
-
-pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
-        return false;
-    };
-    return cam.zoom_enabled && cam.cursor_lock_active;
-}
-
-// only run toggle_x_offset if `offset_toggle_enabled` is true
-fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
-        return false;
-    };
-    cam.offset_toggle_enabled
 }
 
 // inverts the x offset. Example: left shoulder view -> right shoulder view & vice versa
@@ -192,4 +168,28 @@ fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
         return true;
     };
     cam.cursor_lock_toggle_enabled
+}
+
+// only zoom if zoom is enabled & the cursor lock feature is enabled & active
+pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else {
+        return false;
+    };
+    return cam.zoom_enabled && cam.cursor_lock_active;
+}
+
+// only run toggle_x_offset if `offset_toggle_enabled` is true
+fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else {
+        return false;
+    };
+    cam.offset_toggle_enabled
+}
+
+// only run aiming logic if `aim_enabled` is true
+fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else {
+        return false;
+    };
+    cam.aim_enabled
 }
