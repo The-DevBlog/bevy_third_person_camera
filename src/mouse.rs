@@ -6,7 +6,7 @@ use bevy::{
     window::PrimaryWindow,
 };
 
-use crate::{zoom_condition, ThirdPersonCamera};
+use crate::{shared::zoom_condition, ThirdPersonCamera};
 
 pub struct MousePlugin;
 
