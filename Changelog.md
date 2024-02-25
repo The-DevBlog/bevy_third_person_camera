@@ -1,8 +1,21 @@
-# v0.1.10 (pending)
+# v0.1.10
 
 ## <ins>!Breaking Changes!</ins>
 
+View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
+
 - Removed 'focus' field as it had zero effect
+- Renamed 'CustomGamepadSettings' to 'CameraGamepadSettings' for standardization
+- Moved 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module.
+
+## New Features
+
+- Third Person Controller
+  - A new component that will add basic controls to the ThirdPersonCameraTarget.
+  - WASD movement controls 
+  - Sprint Key/Button
+  - Customizable layout
+  - As always, full Gamepad support!
 
 # v0.1.9
 

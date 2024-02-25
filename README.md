@@ -4,6 +4,7 @@
 - Zoom in/out
 - Orbit
 - Custom Offset
+- Movement Controls (WASD + sprint)
 - Cursor Lock
 - Custom Sensitivity
 - Full Gamepad Support!
@@ -16,6 +17,14 @@ Add the **bevy_third_person_camera** crate:
 
 ```
 cargo add bevy_third_person_camera
+```
+
+Import the **bevy_third_person_camera** crate:
+
+```rust
+use bevy_third_person_camera::*;
+use bevy_third_person_camera::controller::*; // optional if you want movement controls
+use bevy_third_person_camera::camera::*; // optional for additional camera settings
 ```
 
 Add the **ThirdPersonPlugin**: 
@@ -45,6 +54,7 @@ commands.spawn((
         ..default()
     },
     ThirdPersonCameraTarget,
+    ThirdPersonController::default() // optional if you want movement controls
     Player,
 ));
 ```
@@ -55,6 +65,7 @@ That's it!
 
 - default
 - custom
+- controller
 
 ```
 cargo run --example <example name>
@@ -88,10 +99,48 @@ zoom: Zoom::new(1.5, 3.0)
 ```
 ![aim demo](assets/aimDemo.gif)
 
+### Controller
+
+Basic input controls that will move the transform of whatever object the 'ThirdPersonCameraTarget' is attached to. There is also a 'sprint' feature that will boost the player's speed.
+
+Usage example: 
+
+```rust 
+fn spawn_player(mut commands: Commands) {
+    commands.spawn((
+        PbrBundle::default(),
+        ThirdPersonCameraTarget,
+        ThirdPersonController::default()
+    ));
+}
+```
+
+```rust 
+// default settings
+move_left: KeyCode::KeyA,
+move_right: KeyCode::KeyD,
+move_forward: KeyCode::KeyW,
+move_back: KeyCode::KeyS,
+sprint_enabled: true,
+sprint: KeyCode::ShiftLeft,
+sprint_speed: 2.0,
+speed: 2.5,
+gamepad_settings: ControllerGamepadSettings::default(),
+
+// default gamepad settings
+sprint: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
+```
+![controller demo](assets/controllerDemo.gif)
+
 ### Cursor Lock
 
 The cursor lock feature allows the mouse cursor to toggle between a locked, hidden state, to an unlocked, visible state. When unlocked, the orbiting feature is disabled, thus allowing the cursor to move freely within the window without disrupting the camera's transform. This feature can be fully disabled by setting the **enable_cursor_lock_toggle** value to **false** and will keep the cursor locked and hidden.
 
+```rust
+cursor_lock_toggle_enabled: true,
+cursor_lock_active: true,
+cursor_lock_key: KeyCode::Space,
+```
 ![cursor lock demo](assets/cursorLockDemo.gif)
 
 ### Orbit
@@ -136,24 +185,48 @@ commands.spawn((
     },
     Camera3dBundle::default(),
 ));
+
+commands.spawn((
+    ThirdPersonCameraTarget, 
+    
+    // default settings
+    ThirdPersonController {
+            move_left: KeyCode::KeyA,
+            move_right: KeyCode::KeyD,
+            move_forward: KeyCode::KeyW,
+            move_back: KeyCode::KeyS,
+            sprint_enabled: true,
+            sprint: KeyCode::ShiftLeft,
+            sprint_speed: 2.0,
+            speed: 2.5,
+            gamepad_settings: ControllerGamepadSettings {
+                sprint: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger)
+            }
+    }
+));
 ```
 
 ## Default Controls
 
-|                    | Mouse/Keyboard      | Gamepad      | Enabled by Default |
-| ------------------ | ------------------- | ------------ | ------------------ |
-| Zoom In            | Scroll Up           | D Pad Up     | Yes                |
-| Zoom Out           | Scroll Down         | D Pad Down   | Yes                |
-| Aim                | Right Mouse Button  | Left Trigger | No                 |
-| Toggle Offset      | E                   | D Pad Right  | No                 |
-| Cursor Lock/Unlock | Space               | n/a          | Yes                |
-| Orbit Button       | Middle Mouse Button | Left Bumper  | No                 |
+| Action             | Mouse/Keyboard      | Gamepad       | Enabled by Default |
+| ------------------ | ------------------- | ------------- | ------------------ |
+| Zoom In            | Scroll Up           | D Pad Up      | Yes                |
+| Zoom Out           | Scroll Down         | D Pad Down    | Yes                |
+| Aim                | Right Mouse Button  | Left Trigger  | No                 |
+| Toggle Offset      | E                   | D Pad Right   | No                 |
+| Cursor Lock/Unlock | Space               | n/a           | Yes                |
+| Orbit Button       | Middle Mouse Button | Left Bumper   | No                 |
+| Move Left          | A                   | Left Joystick | Yes                |
+| Move Right         | D                   | Left Joystick | Yes                |
+| Move Forward       | W                   | Left Joystick | Yes                |
+| Move Back          | S                   | Left Joystick | Yes                |
+| Sprint             | Left Shift          | Left Bumper   | Yes                |
 
 ## Bevy Version Compatibility
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.13 | 0.1.9                    |
+| 0.13 | 0.1.9 - 0.1.10           |
 | 0.12 | 0.1.7 - 0.1.8            |
 | 0.11 | 0.1.1 - 0.1.6            |
 
