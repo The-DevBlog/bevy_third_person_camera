@@ -20,9 +20,10 @@ cargo add bevy_third_person_camera
 ```
 
 Import the **bevy_third_person_camera** crate:
+
 ```rust
 use bevy_third_person_camera::*;
-use bevy_third_person_camera::controller::*; // optional for movement controls
+use bevy_third_person_camera::controller::*; // optional if you want movement controls
 use bevy_third_person_camera::camera::*; // optional for additional camera settings
 ```
 
@@ -53,7 +54,7 @@ commands.spawn((
         ..default()
     },
     ThirdPersonCameraTarget,
-    ThirdPersonController::default() // optional for movement controls
+    ThirdPersonController::default() // optional if you want movement controls
     Player,
 ));
 ```
