@@ -1,3 +1,9 @@
+# v0.1.10 (pending)
+
+## <ins>!Breaking Changes!</ins>
+
+- Removed 'focus' field as it had zero effect
+
 # v0.1.9
 
 - Updated Bevy to latest version 0.13.0 [KyleWinston](https://github.com/KyleWinston)

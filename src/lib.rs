@@ -54,7 +54,6 @@ pub struct ThirdPersonCamera {
     pub cursor_lock_toggle_enabled: bool,
     pub cursor_lock_active: bool,
     pub cursor_lock_key: KeyCode,
-    pub focus: Vec3,
     pub gamepad_settings: CustomGamepadSettings,
     pub mouse_sensitivity: f32,
     pub mouse_orbit_button_enabled: bool,
@@ -78,7 +77,6 @@ impl Default for ThirdPersonCamera {
             aim_zoom: 0.7,
             cursor_lock_key: KeyCode::Space,
             cursor_lock_toggle_enabled: true,
-            focus: Vec3::ZERO,
             gamepad_settings: CustomGamepadSettings::default(),
             cursor_lock_active: true,
             mouse_sensitivity: 1.0,
@@ -216,7 +214,7 @@ fn sync_player_camera(
         return;
     };
 
-    // Calculate the desired camera translation based on focus, radius, and xy_offset
+    // Calculate the desired camera translation based, radius, and xy_offset
     let rotation_matrix = Mat3::from_quat(cam_transform.rotation);
 
     // apply the offset if offset_enabled is true
@@ -226,11 +224,10 @@ fn sync_player_camera(
     }
 
     let desired_translation =
-        cam.focus + rotation_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius)) + offset;
+        rotation_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius)) + offset;
 
-    // Update the camera translation and focus
-    let delta = player.translation - cam.focus;
-    cam_transform.translation = desired_translation + delta;
+    // Update the camera translation
+    cam_transform.translation = desired_translation + player.translation;
 }
 
 // only run aiming logic if `aim_enabled` is true

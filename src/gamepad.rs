@@ -131,6 +131,5 @@ pub fn orbit_gamepad(
     }
 
     let rot_matrix = Mat3::from_quat(cam_transform.rotation);
-    cam_transform.translation =
-        cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
+    cam_transform.translation = rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
 }
