@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use crate::{GamepadResource, ThirdPersonCamera};
+use crate::{camera::GamepadResource, camera::ThirdPersonCamera};
 use bevy::{
     input::gamepad::{GamepadConnection::*, *},
     prelude::*,

@@ -1,11 +1,10 @@
 use bevy::prelude::*;
-use bevy_third_person_camera::camera::*;
+use bevy_third_person_camera::{camera::*, controller::ThirdPersonController};
 
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, ThirdPersonCameraPlugin))
         .add_systems(Startup, (spawn_player, spawn_world, spawn_camera))
-        .add_systems(Update, player_movement_keyboard)
         .run();
 }
 
@@ -24,6 +23,7 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
         },
         Player,
         ThirdPersonCameraTarget,
+        ThirdPersonController,
         Speed(2.5),
     );
 
@@ -74,49 +74,4 @@ fn spawn_world(
 
     commands.spawn(floor);
     commands.spawn(light);
-}
-
-fn player_movement_keyboard(
-    time: Res<Time>,
-    keys: Res<ButtonInput<KeyCode>>,
-    mut player_q: Query<(&mut Transform, &Speed), With<Player>>,
-    cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
-) {
-    for (mut player_transform, player_speed) in player_q.iter_mut() {
-        let cam = match cam_q.get_single() {
-            Ok(c) => c,
-            Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
-        };
-
-        let mut direction = Vec3::ZERO;
-
-        // forward
-        if keys.pressed(KeyCode::KeyW) {
-            direction += *cam.forward();
-        }
-
-        // back
-        if keys.pressed(KeyCode::KeyS) {
-            direction += *cam.back();
-        }
-
-        // left
-        if keys.pressed(KeyCode::KeyA) {
-            direction += *cam.left();
-        }
-
-        // right
-        if keys.pressed(KeyCode::KeyD) {
-            direction += *cam.right();
-        }
-
-        direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
-        player_transform.translation += movement;
-
-        // rotate player to face direction he is currently moving
-        if direction.length_squared() > 0.0 {
-            player_transform.look_to(direction, Vec3::Y);
-        }
-    }
 }
