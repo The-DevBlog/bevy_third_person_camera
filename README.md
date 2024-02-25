@@ -232,6 +232,10 @@ commands.spawn((
 
 Refer to the [Changelog](Changelog.md) to view breaking changes and updates.
 
+## Migration Guides
+
+- [v0.1.9 -> v0.1.10](migrationGuides/v0.1.9-v0.1.10.md)
+
 ## License
 
 - MIT License (LICENSE-MIT or http://opensource.org/licenses/MIT)
