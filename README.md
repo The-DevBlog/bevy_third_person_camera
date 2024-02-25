@@ -140,7 +140,7 @@ commands.spawn((
 
 ## Default Controls
 
-|                    | Mouse/Keyboard      | Gamepad      | Enabled by Default |
+| Action             | Mouse/Keyboard      | Gamepad      | Enabled by Default |
 | ------------------ | ------------------- | ------------ | ------------------ |
 | Zoom In            | Scroll Up           | D Pad Up     | Yes                |
 | Zoom Out           | Scroll Down         | D Pad Down   | Yes                |
