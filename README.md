@@ -55,6 +55,7 @@ That's it!
 
 - default
 - custom
+- controller
 
 ```
 cargo run --example <example name>
@@ -87,6 +88,10 @@ aim_button: Some(MouseButton::Right), // default
 zoom: Zoom::new(1.5, 3.0)
 ```
 ![aim demo](assets/aimDemo.gif)
+
+### Controller
+
+![controller demo](assets/controllerDemo.gif)
 
 ### Cursor Lock
 
@@ -153,7 +158,7 @@ commands.spawn((
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.13 | 0.1.9                    |
+| 0.13 | 0.1.9 - 0.1.10           |
 | 0.12 | 0.1.7 - 0.1.8            |
 | 0.11 | 0.1.1 - 0.1.6            |
 

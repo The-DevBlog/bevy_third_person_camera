@@ -59,6 +59,13 @@ fn spawn_world(
         ..default()
     };
 
+    let block = PbrBundle {
+        mesh: meshes.add(Mesh::from(Cuboid::new(0.5, 0.5, 0.5))),
+        transform: Transform::from_xyz(2.5, 0.25, -2.5),
+        material: materials.add(Color::BLUE),
+        ..default()
+    };
+
     let light = PointLightBundle {
         point_light: PointLight {
             intensity: 1500.0 * 1000.0,
@@ -68,6 +75,7 @@ fn spawn_world(
         ..default()
     };
 
+    commands.spawn(block);
     commands.spawn(floor);
     commands.spawn(light);
 }

@@ -6,7 +6,7 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
 - Removed 'focus' field as it had zero effect
 - Renamed 'CustomGamepadSettings' to 'CameraGamepadSettings' for standardization
-- Changed location of 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module.
+- Moved 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module.
 
 ## New Features
 
@@ -15,7 +15,7 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
   - WASD movement controls 
   - Sprint Key/Button
   - Customizable layout
-  - As always, full Gamepad support
+  - As always, full Gamepad support!
 
 # v0.1.9
 
