@@ -1,5 +1,5 @@
 use super::ThirdPersonController;
-use crate::camera::GamepadResource;
+use crate::{camera::GamepadResource, ThirdPersonCamera};
 use bevy::prelude::*;
 
 pub struct KeyboardPlugin;
@@ -14,7 +14,7 @@ fn movement(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
     mut controller_q: Query<(&mut Transform, &ThirdPersonController), With<ThirdPersonController>>,
-    cam_q: Query<&Transform, (With<Camera3d>, Without<ThirdPersonController>)>,
+    cam_q: Query<&Transform, (With<ThirdPersonCamera>, Without<ThirdPersonController>)>,
 ) {
     for (mut transform, controller) in controller_q.iter_mut() {
         let cam = cam_q

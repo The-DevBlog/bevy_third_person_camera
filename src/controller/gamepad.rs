@@ -1,5 +1,5 @@
 use super::ThirdPersonController;
-use crate::camera::GamepadResource;
+use crate::{camera::GamepadResource, ThirdPersonCamera};
 use bevy::prelude::*;
 
 pub struct GamepadPlugin;
@@ -15,7 +15,7 @@ fn movement(
     axis: Res<Axis<GamepadAxis>>,
     btns: Res<ButtonInput<GamepadButton>>,
     mut controller_q: Query<(&mut Transform, &ThirdPersonController), With<ThirdPersonController>>,
-    cam_q: Query<&Transform, (With<Camera3d>, Without<ThirdPersonController>)>,
+    cam_q: Query<&Transform, (With<ThirdPersonCamera>, Without<ThirdPersonController>)>,
     gamepad_res: Option<Res<GamepadResource>>,
 ) {
     // return gamepad if one is connected
