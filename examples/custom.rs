@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_third_person_camera::camera::*;
+use bevy_third_person_camera::{camera::*, *};
 
 fn main() {
     App::new()
@@ -41,7 +41,7 @@ fn spawn_camera(mut commands: Commands) {
             aim_zoom: 0.7,  // default
             offset_enabled: true,
             offset_toggle_enabled: true,
-            gamepad_settings: CustomGamepadSettings { ..default() },
+            gamepad_settings: CameraGamepadSettings { ..default() },
             zoom_enabled: true,        // default
             zoom: Zoom::new(1.5, 3.0), // default
             ..default()

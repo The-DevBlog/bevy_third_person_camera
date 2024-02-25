@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/AndrewCS149/bevy_third_person_camera"
 homepage = "https://github.com/AndrewCS149/bevy_third_person_camera"
 readme = "README.md"
-exclude = ["assets/*"]
+exclude = ["assets/*", "migrationGuides/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

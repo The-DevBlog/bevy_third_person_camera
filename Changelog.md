@@ -2,8 +2,12 @@
 
 ## <ins>!Breaking Changes!</ins>
 
+View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
+
 - Removed 'focus' field as it had zero effect
-  
+- Renamed 'CustomGamepadSettings' to 'CameraGamepadSettings' for standardization
+- Changed location of 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module.
+
 ## New Features
 
 - Third Person Controller

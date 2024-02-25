@@ -1,6 +1,6 @@
 use crate::{
-    camera::gamepad::orbit_gamepad, camera::mouse::orbit_mouse, camera::ThirdPersonCamera,
-    camera::ThirdPersonCameraTarget,
+    camera::{gamepad::orbit_gamepad, mouse::orbit_mouse},
+    *,
 };
 use bevy::{
     prelude::*,

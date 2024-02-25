@@ -1,4 +1,4 @@
-use crate::{camera::GamepadResource, camera::ThirdPersonCamera};
+use crate::{camera::GamepadResource, ThirdPersonCamera};
 use bevy::{
     input::gamepad::{GamepadConnection::*, *},
     prelude::*,

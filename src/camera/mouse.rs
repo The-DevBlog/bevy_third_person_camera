@@ -1,11 +1,10 @@
+use crate::{camera::shared::zoom_condition, ThirdPersonCamera};
 use bevy::{
     input::mouse::{MouseMotion, MouseWheel},
     prelude::*,
     window::PrimaryWindow,
 };
 use std::f32::consts::PI;
-
-use crate::{camera::shared::zoom_condition, camera::ThirdPersonCamera};
 
 pub struct MousePlugin;
 

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_third_person_camera::camera::*;
+use bevy_third_person_camera::*;
 
 fn main() {
     App::new()
