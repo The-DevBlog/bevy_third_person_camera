@@ -1,4 +1,4 @@
-# v0.1.10 (pending)
+# v0.1.10
 
 ## <ins>!Breaking Changes!</ins>
 
