@@ -101,7 +101,7 @@ zoom: Zoom::new(1.5, 3.0)
 
 ### Controller
 
-Basic input controls that will move the transform of whatever object the 'ThirdPersonCameraTarget' is attached to. There is also a 'sprint' feature that will boost the player's speed.
+The **ThirdPersonController** component adds basic input controls (WASD movements + LShift sprint) to the entity it is attached to. This component must be inserted into the same entity that the 'ThirdPersonCameraTarget' component is attached to.
 
 Usage example: 
 
