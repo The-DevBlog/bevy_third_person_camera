@@ -7,6 +7,9 @@ use bevy::{
     window::{CursorGrabMode, PrimaryWindow},
 };
 
+#[cfg(feature = "bevy_rapier2d")]
+use bevy_rapier2d::plugin::PhysicsSet;
+
 pub struct SharedPlugin;
 
 impl Plugin for SharedPlugin {
@@ -15,11 +18,14 @@ impl Plugin for SharedPlugin {
             Update,
             (
                 aim.run_if(aim_condition),
-                sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
                 toggle_x_offset.run_if(toggle_x_offset_condition),
                 toggle_cursor.run_if(toggle_cursor_condition),
+                sync_player_camera.run_if(check_engine).after(orbit_mouse).after(orbit_gamepad),
             ),
         );
+        // Only runs if the feature bevy_rapier exists
+        #[cfg(feature = "bevy_rapier2d")]
+        app.add_systems(PostUpdate, sync_player_camera.after(PhysicsSet::StepSimulation));
     }
 }
 
@@ -193,3 +199,12 @@ fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> b
     };
     cam.aim_enabled
 }
+
+// Check if the is an engine being passed to thirdpersoncameratarget
+fn check_engine(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
+    let Ok(cam) = cam_q.get_single() else {
+        return true;
+    };
+    return cam.physics_engine.is_some()
+}
+

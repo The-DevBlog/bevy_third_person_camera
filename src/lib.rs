@@ -45,6 +45,7 @@ pub struct ThirdPersonCamera {
     pub zoom_enabled: bool,
     pub zoom: Zoom,
     pub zoom_sensitivity: f32,
+    pub physics_engine: Option<String>,
 }
 
 impl Default for ThirdPersonCamera {
@@ -69,6 +70,7 @@ impl Default for ThirdPersonCamera {
             zoom_enabled: true,
             zoom: Zoom::new(1.5, 3.0),
             zoom_sensitivity: 1.0,
+            physics_engine: None
         }
     }
 }

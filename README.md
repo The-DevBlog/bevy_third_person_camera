@@ -147,6 +147,12 @@ cursor_lock_key: KeyCode::Space,
 
 Orbiting is enabled by default. However, you can set the `mouse_orbit_button_enabled` setting to `true` and the orbiting will only be active while the `mouse_orbit_button` is pressed.
 
+### Checking for physics engines
+
+If you are using the camera to follow a character around, and you are moving it by one of the many physic character controllers. 
+This will fix jittering for you making it run after the step responsible for updating global transforms. 
+You need to use cargo build --all-features. And avoid setting default-features=false when importing bevy_third_person_camera
+
 ## Custom Settings
 
 Most settings can be overridden: 

@@ -15,5 +15,12 @@ exclude = ["assets/*", "migrationGuides/*"]
 
 [dependencies]
 bevy = { version = "0.13.0", default-features = false }
+bevy_rapier2d = { version = "*",optional = true}
+bevy_rapier3d = { version = "*",optional = true}
+
 [dev-dependencies]
 bevy = { version = "0.13.0" }
+
+[features]
+bevy_rapier2d =  ["dep:bevy_rapier2d"]
+bevy_rapier3d =  ["dep:bevy_rapier3d"]

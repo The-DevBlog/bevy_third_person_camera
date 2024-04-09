@@ -40,7 +40,8 @@ fn spawn_camera(mut commands: Commands) {
             offset_toggle_enabled: true,
             gamepad_settings: CameraGamepadSettings { ..default() },
             zoom_enabled: true,        // default
-            zoom: Zoom::new(1.5, 3.0), // default
+            zoom: Zoom::new(1.5, 3.0),
+            physics_engine: Some("bevy_rapier".to_string()),
             ..default()
         },
     );
