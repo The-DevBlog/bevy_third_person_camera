@@ -1,3 +1,16 @@
+# v0.1.11 (not published)
+
+## <ins>!Breaking Changes!<ins>
+
+View the [migration guide here](migrationGuides/v0.1.10-v0.1.11.md)
+
+- Changed ThirdPersonCamera field 'mouse_sensitivity' type to Vec2
+- Replaced CameraGamepadSettings fields 'x_sensitivity' & 'y_sensitivity' fields with 'sensitivity' field with type Vec2
+
+## Minor Changes
+
+- Upgrade to Bevy v0.13.2
+
 # v0.1.10
 
 ## <ins>!Breaking Changes!</ins>
@@ -6,12 +19,12 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
 - Removed 'focus' field as it had zero effect
 - Renamed 'CustomGamepadSettings' to 'CameraGamepadSettings' for standardization
-- Moved 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module.
+- Moved 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module
 
 ## New Features
 
 - Third Person Controller
-  - A new component that will add basic controls to the ThirdPersonCameraTarget.
+  - A new component that will add basic controls to the ThirdPersonCameraTarget
   - WASD movement controls 
   - Sprint Key/Button
   - Customizable layout

@@ -161,9 +161,9 @@ commands.spawn((
         aim_speed: 3.0,
         aim_zoom: 0.7,
         cursor_lock_toggle_enabled: true,
-        cursor_lock_active: true,
+        cursor_lock_active: true,sa
         cursor_lock_key: KeyCode::Space,
-        mouse_sensitivity: 2.0,
+        sensitivity: Vec2::new(1.0, 1.0),
         mouse_orbit_button_enabled: false,
         mouse_orbit_button: MouseButton::Middle,
         offset_enabled: false,
@@ -172,11 +172,10 @@ commands.spawn((
         offset_toggle_key: Some(KeyCode::T), // default is None
         zoom: Zoom::new(1.5, 3.0),
         zoom_sensitivity: 1.0,
-        gamepad_settings: CustomGamepadSettings {
+        gamepad_settings: CameraGamepadSettings {
             aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
             mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
-            x_sensitivity: 7.0,
-            y_sensitivity: 4.0,
+            sensitivity: Vec2::new(1.0, 1.0),
             offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)), // default is None
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
             zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
@@ -226,7 +225,7 @@ commands.spawn((
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.13 | 0.1.9 - 0.1.10           |
+| 0.13 | 0.1.9 - 0.1.11           |
 | 0.12 | 0.1.7 - 0.1.8            |
 | 0.11 | 0.1.1 - 0.1.6            |
 

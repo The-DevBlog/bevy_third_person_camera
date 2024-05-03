@@ -101,8 +101,7 @@ pub struct CameraGamepadSettings {
     pub aim_button: GamepadButton,
     pub mouse_orbit_button: GamepadButton,
     pub offset_toggle_button: GamepadButton,
-    pub x_sensitivity: f32,
-    pub y_sensitivity: f32,
+    pub sensitivity: Vec2,
     pub zoom_in_button: GamepadButton,
     pub zoom_out_button: GamepadButton,
 }
@@ -114,8 +113,7 @@ impl Default for CameraGamepadSettings {
             aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
             mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
             offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
-            x_sensitivity: 7.0,
-            y_sensitivity: 4.0,
+            sensitivity: Vec2::new(1.0, 1.0),
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
             zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
         }
