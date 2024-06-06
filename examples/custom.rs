@@ -54,7 +54,7 @@ fn spawn_world(
 ) {
     let floor = PbrBundle {
         mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-        material: materials.add(Color::DARK_GREEN),
+        material: materials.add(Color::srgb(0.2, 0.6, 0.2)),
         ..default()
     };
 

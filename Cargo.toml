@@ -14,6 +14,6 @@ exclude = ["assets/*", "migrationGuides/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.13.2", default-features = false }
+bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
 [dev-dependencies]
-bevy = { version = "0.13.2" }
+bevy = { git = "https://github.com/bevyengine/bevy", branch = "main" }
