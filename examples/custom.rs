@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css::DARK_GREEN, prelude::*};
 use bevy_third_person_camera::{camera::*, *};
 
 fn main() {
@@ -54,7 +54,7 @@ fn spawn_world(
 ) {
     let floor = PbrBundle {
         mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-        material: materials.add(Color::srgb(0.2, 0.6, 0.2)),
+        material: materials.add(DARK_GREEN),
         ..default()
     };
 
