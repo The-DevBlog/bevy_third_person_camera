@@ -22,7 +22,6 @@ Import the **bevy_third_person_camera** crate:
 
 ```rust
 use bevy_third_person_camera::*;
-use bevy_third_person_camera::camera::*; // optional for additional camera settings
 ```
 
 Add the **ThirdPersonPlugin**: 
@@ -147,8 +146,6 @@ commands.spawn((
     },
     Camera3dBundle::default(),
 ));
-
-commands.spawn(ThirdPersonCameraTarget);
 ```
 
 ## Default Controls
