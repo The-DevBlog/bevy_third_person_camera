@@ -113,10 +113,10 @@ pub fn orbit_gamepad(
             let delta = rotation.x / window.width()
                 * std::f32::consts::PI
                 * 2.0
-                * cam.gamepad_settings.x_sensitivity;
+                * cam.gamepad_settings.sensitivity.x;
             delta
         };
-        let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.y_sensitivity;
+        let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.sensitivity.y;
         let yaw = Quat::from_rotation_y(-delta_x);
         let pitch = Quat::from_rotation_x(-delta_y);
         cam_transform.rotation = yaw * cam_transform.rotation; // rotate around global y axis

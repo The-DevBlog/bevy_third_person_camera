@@ -51,17 +51,16 @@ pub fn orbit_mouse(
         return;
     }
 
-    rotation *= cam.mouse_sensitivity;
+    rotation *= cam.sensitivity;
 
     if rotation.length_squared() > 0.0 {
         let window = window_q.get_single().unwrap();
         let delta_x = {
-            let delta =
-                rotation.x / window.width() * std::f32::consts::PI * cam.mouse_sensitivity.x;
+            let delta = rotation.x / window.width() * std::f32::consts::PI * cam.sensitivity.x;
             delta
         };
 
-        let delta_y = rotation.y / window.height() * PI * cam.mouse_sensitivity.y;
+        let delta_y = rotation.y / window.height() * PI * cam.sensitivity.y;
         let yaw = Quat::from_rotation_y(-delta_x);
         let pitch = Quat::from_rotation_x(-delta_y);
         cam_transform.rotation = yaw * cam_transform.rotation; // rotate around global y axis
