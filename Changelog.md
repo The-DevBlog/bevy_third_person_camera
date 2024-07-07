@@ -4,12 +4,15 @@
 
 View the [migration guide here](migrationGuides/v0.1.10-v0.1.11.md)
 
+- Completely removed the controller logic
+  - I regretted adding this initially. This has no place in the camera crate itself, as it serves a different purpose. I would like to keep this crate focused on the camera logic only going forward.
 - Changed ThirdPersonCamera field 'mouse_sensitivity' type to Vec2
 - Replaced CameraGamepadSettings fields 'x_sensitivity' & 'y_sensitivity' fields with 'sensitivity' field with type Vec2
 
 ## Minor Changes
 
-- Upgrade to Bevy v0.13.2
+- Upgrade to Bevy v0.14.0
+- Added more documentation
 
 # v0.1.10
 
@@ -23,7 +26,7 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
 ## New Features
 
-- Third Person Controller
+- Third Person Controller (deprecated)
   - A new component that will add basic controls to the ThirdPersonCameraTarget
   - WASD movement controls 
   - Sprint Key/Button
