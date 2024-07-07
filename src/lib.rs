@@ -47,24 +47,71 @@ impl Plugin for ThirdPersonCameraPlugin {
 /// ```
 #[derive(Component)]
 pub struct ThirdPersonCamera {
+    /// Flag to indicate if the aim functionality is turned on.
+    /// Default is false
     pub aim_enabled: bool,
+    /// The mouse aim button binding.
+    /// Default is MouseButton::Right
     pub aim_button: MouseButton,
+    /// The speed at which aiming occurs.
+    /// Default is 3.0
     pub aim_speed: f32,
+    /// The zoom level of the aim zooming functionality.
+    /// This value should be >= 0.l, and <= Zoom.min.
+    /// The smaller the value, the greater the zoom distance. 0.1 would essentially look like 'first person'.
+    /// Default is 0.7
     pub aim_zoom: f32,
+    /// Flag to indicate if the cursor lock toggle functionality is turned on.
+    /// When enabled and the cursor lock is NOT active, the mouse can freely move about the window without the camera's transform changing.
+    /// Example usage: Browsing a character inventory without moving the camera.
+    /// Default is true
     pub cursor_lock_toggle_enabled: bool,
+    /// Flag to indicate if the cursor is in a locked state or not.
+    /// Default is true
     pub cursor_lock_active: bool,
+    /// The cursor lock toggle key binding.
+    /// Default is KeyCode::Space
     pub cursor_lock_key: KeyCode,
+    /// Custom gamepad settings.
     pub gamepad_settings: CustomGamepadSettings,
+    /// Mouse x/y sensitivity
+    /// Default is Vec2::new(1.0, 1.0)
     pub sensitivity: Vec2,
+    /// Flag to indicate if the orbiting functionality is controlled when a mouse button is being pressed.
+    /// Default is false
     pub mouse_orbit_button_enabled: bool,
+    /// The mouse button binding to control when the orbiting occurs.
+    /// Default is MouseButton:Middle
     pub mouse_orbit_button: MouseButton,
+    /// Flag to indicate whether there is a camera offset applied or not.
+    /// Default is false
     pub offset_enabled: bool,
+    /// The camera offset relative to the camera target.
+    /// Offset is a tuple. The first value corresponds to the x offset, the second value to the y offset.
+    /// Example: offset: Offset::new(<my_x_value>, <my_y_value>);
+    /// Default is Offset::new(0.5, 0.4)
     pub offset: Offset,
+    /// Inverts the x value of the offset.
+    /// Example: If the x offset is set to 5.0, then the x offset will be inverted to -5.0 if this is set to true.
+    /// Default is false
     pub offset_toggle_enabled: bool,
+    /// The key binding of the offset toggle
+    /// Default is KeyCode::KeyE
     pub offset_toggle_key: KeyCode,
+    /// The speed at which the x offset will transition.
+    /// Default is 5.0
     pub offset_toggle_speed: f32,
+    /// Flag to indicate whether a camera zoom is applied or not.
+    /// Default is true
     pub zoom_enabled: bool,
+    /// The min/max bounds of the camera.
+    /// This is different than the aim zoom. This zoom is the position the camera stays in relation to the camera target.
+    /// Zoom is a tuple. The first value is the minimum zoom. The smaller the value, the closer the camera can come to it's target. The second value is the maximum zoom. The greater the maximum zoom, the farther away the camera can go from it's target.
+    /// The zoom is adjusted using the scroll wheel.
+    /// Default is Zoom::new(1.5, 3.0);
     pub zoom: Zoom,
+    /// The speed at which the scroll wheel zooms in or out.
+    /// Default is 1.0
     pub zoom_sensitivity: f32,
 }
 
@@ -162,11 +209,23 @@ pub struct GamepadResource(pub Gamepad);
 /// ```
 #[derive(Component)]
 pub struct CustomGamepadSettings {
+    /// The aim button binding.
+    /// Default is GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)
     pub aim_button: GamepadButton,
+    /// The button binding to control when the orbiting occurs.
+    /// Default is GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger)
     pub mouse_orbit_button: GamepadButton,
+    /// The button binding of the offset toggle
+    /// Default is GamepadButton::new(gamepad, GamepadButtonType::DPadRight)
     pub offset_toggle_button: GamepadButton,
+    /// Gamepad x/y sensitivity
+    /// Default is Vec2::new(7.0, 4.0)
     pub sensitivity: Vec2,
+    /// The camera zoom in button binding (equivalent to the scroll wheel zoom)
+    /// GamepadButton::new(gamepad, GamepadButtonType::DPadUp)
     pub zoom_in_button: GamepadButton,
+    /// The camera zoom out button binding (equivalent to the scroll wheel zoom)
+    /// GamepadButton::new(gamepad, GamepadButtonType::DPadDown)
     pub zoom_out_button: GamepadButton,
 }
 
