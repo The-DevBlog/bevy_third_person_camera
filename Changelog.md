@@ -11,7 +11,7 @@ View the [migration guide here](migrationGuides/v0.1.10-v0.1.11.md)
 
 ## Minor Changes
 
-- Upgrade to Bevy v0.14.0
+- Upgrade to Bevy v0.14.0 [KyleWinston](https://github.com/KyleWinston)
 - Add documentation
 
 # v0.1.10
