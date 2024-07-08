@@ -4,7 +4,6 @@
 - Zoom in/out
 - Orbit
 - Custom Offset
-- Movement Controls (WASD + sprint)
 - Cursor Lock
 - Custom Sensitivity
 - Full Gamepad Support!
@@ -23,8 +22,6 @@ Import the **bevy_third_person_camera** crate:
 
 ```rust
 use bevy_third_person_camera::*;
-use bevy_third_person_camera::controller::*; // optional if you want movement controls
-use bevy_third_person_camera::camera::*; // optional for additional camera settings
 ```
 
 Add the **ThirdPersonPlugin**: 
@@ -54,7 +51,6 @@ commands.spawn((
         ..default()
     },
     ThirdPersonCameraTarget,
-    ThirdPersonController::default() // optional if you want movement controls
     Player,
 ));
 ```
@@ -65,7 +61,6 @@ That's it!
 
 - default
 - custom
-- controller
 
 ```
 cargo run --example <example name>
@@ -98,39 +93,6 @@ aim_button: Some(MouseButton::Right), // default
 zoom: Zoom::new(1.5, 3.0)
 ```
 ![aim demo](assets/aimDemo.gif)
-
-### Controller
-
-The **ThirdPersonController** component adds basic input controls (WASD movements + LShift sprint) to the entity it is attached to. This component must be inserted into the same entity that the 'ThirdPersonCameraTarget' component is attached to.
-
-Usage example: 
-
-```rust 
-fn spawn_player(mut commands: Commands) {
-    commands.spawn((
-        PbrBundle::default(),
-        ThirdPersonCameraTarget,
-        ThirdPersonController::default()
-    ));
-}
-```
-
-```rust 
-// default settings
-move_left: KeyCode::KeyA,
-move_right: KeyCode::KeyD,
-move_forward: KeyCode::KeyW,
-move_back: KeyCode::KeyS,
-sprint_enabled: true,
-sprint: KeyCode::ShiftLeft,
-sprint_speed: 2.0,
-speed: 2.5,
-gamepad_settings: ControllerGamepadSettings::default(),
-
-// default gamepad settings
-sprint: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
-```
-![controller demo](assets/controllerDemo.gif)
 
 ### Cursor Lock
 
@@ -184,48 +146,25 @@ commands.spawn((
     },
     Camera3dBundle::default(),
 ));
-
-commands.spawn((
-    ThirdPersonCameraTarget, 
-    
-    // default settings
-    ThirdPersonController {
-            move_left: KeyCode::KeyA,
-            move_right: KeyCode::KeyD,
-            move_forward: KeyCode::KeyW,
-            move_back: KeyCode::KeyS,
-            sprint_enabled: true,
-            sprint: KeyCode::ShiftLeft,
-            sprint_speed: 2.0,
-            speed: 2.5,
-            gamepad_settings: ControllerGamepadSettings {
-                sprint: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger)
-            }
-    }
-));
 ```
 
 ## Default Controls
 
-| Action             | Mouse/Keyboard      | Gamepad       | Enabled by Default |
-| ------------------ | ------------------- | ------------- | ------------------ |
-| Zoom In            | Scroll Up           | D Pad Up      | Yes                |
-| Zoom Out           | Scroll Down         | D Pad Down    | Yes                |
-| Aim                | Right Mouse Button  | Left Trigger  | No                 |
-| Toggle Offset      | E                   | D Pad Right   | No                 |
-| Cursor Lock/Unlock | Space               | n/a           | Yes                |
-| Orbit Button       | Middle Mouse Button | Left Bumper   | No                 |
-| Move Left          | A                   | Left Joystick | Yes                |
-| Move Right         | D                   | Left Joystick | Yes                |
-| Move Forward       | W                   | Left Joystick | Yes                |
-| Move Back          | S                   | Left Joystick | Yes                |
-| Sprint             | Left Shift          | Left Bumper   | Yes                |
+| Action             | Mouse/Keyboard      | Gamepad      | Enabled by Default |
+| ------------------ | ------------------- | ------------ | ------------------ |
+| Zoom In            | Scroll Up           | D Pad Up     | Yes                |
+| Zoom Out           | Scroll Down         | D Pad Down   | Yes                |
+| Aim                | Right Mouse Button  | Left Trigger | No                 |
+| Toggle Offset      | E                   | D Pad Right  | No                 |
+| Cursor Lock/Unlock | Space               | n/a          | Yes                |
+| Orbit Button       | Middle Mouse Button | Left Bumper  | No                 |
 
 ## Bevy Version Compatibility
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.13 | 0.1.9 - 0.1.11           |
+| 0.14 | 0.1.11                   |
+| 0.13 | 0.1.9 - 0.1.10           |
 | 0.12 | 0.1.7 - 0.1.8            |
 | 0.11 | 0.1.1 - 0.1.6            |
 
@@ -233,6 +172,7 @@ Refer to the [Changelog](Changelog.md) to view breaking changes and updates.
 
 ## Migration Guides
 
+- [v0.1.10 -> v0.1.11](migrationGuides/v0.1.10-v0.1.11.md)
 - [v0.1.9 -> v0.1.10](migrationGuides/v0.1.9-v0.1.10.md)
 
 ## License
