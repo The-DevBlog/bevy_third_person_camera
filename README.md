@@ -137,7 +137,7 @@ commands.spawn((
         gamepad_settings: CameraGamepadSettings {
             aim_button: Some(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2)),
             mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
-            sensitivity: Vec2::new(1.0, 1.0),
+            sensitivity: Vec2::new(7.0, 4.0),
             offset_toggle_button: Some(GamepadButton::new(gamepad, GamepadButtonType::DPadRight)), // default is None
             zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
             zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),

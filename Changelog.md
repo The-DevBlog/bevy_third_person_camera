@@ -5,7 +5,7 @@
 View the [migration guide here](migrationGuides/v0.1.10-v0.1.11.md)
 
 - Completely removed the controller logic
-  - I regretted adding this initially. This has no place in the camera crate itself, as it serves a different purpose. I would like to keep this crate focused on the camera logic only going forward.
+  - I regretted adding this initially. This has no place in the camera crate itself, as it serves a different purpose. I would like to keep this crate focused on the camera logic only going forward. Additionally, changing the translation itself is not how movement should be done.
 - Changed ThirdPersonCamera field 'mouse_sensitivity' type to Vec2
 - Replaced CameraGamepadSettings fields 'x_sensitivity' & 'y_sensitivity' fields with 'sensitivity' field with type Vec2
 
