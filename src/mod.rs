@@ -1,6 +1,6 @@
-pub mod gamepad;
-pub mod mouse;
-pub mod shared;
+mod gamepad;
+mod mouse;
+mod shared;
 
 use bevy::prelude::*;
 use gamepad::GamePadPlugin;
