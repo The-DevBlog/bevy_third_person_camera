@@ -19,6 +19,9 @@ use mouse::MousePlugin;
 /// ```
 pub struct ThirdPersonCameraPlugin;
 
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CameraSyncSet;
+
 impl Plugin for ThirdPersonCameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((MousePlugin, GamePadPlugin))
@@ -29,11 +32,13 @@ impl Plugin for ThirdPersonCameraPlugin {
                     toggle_x_offset.run_if(toggle_x_offset_condition),
                     toggle_cursor.run_if(toggle_cursor_condition),
                 ),
+            )
+            .add_systems(
+                PostUpdate,
+                sync_player_camera
+                    .before(TransformSystem::TransformPropagate)
+                    .in_set(CameraSyncSet),
             );
-            // .add_systems(
-            //     PostUpdate,
-            //     sync_player_camera.before(TransformSystem::TransformPropagate),
-            // );
     }
 }
 
@@ -264,7 +269,7 @@ impl Default for CustomGamepadSettings {
 #[derive(Component)]
 pub struct ThirdPersonCameraTarget;
 
-pub fn sync_player_camera(
+fn sync_player_camera(
     player_q: Query<&Transform, With<ThirdPersonCameraTarget>>,
     mut cam_q: Query<(&mut ThirdPersonCamera, &mut Transform), Without<ThirdPersonCameraTarget>>,
 ) {
