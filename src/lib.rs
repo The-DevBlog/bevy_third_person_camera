@@ -5,8 +5,8 @@ use bevy::{
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
-use gamepad::{orbit_gamepad, GamePadPlugin};
-use mouse::{orbit_mouse, MousePlugin};
+use gamepad::GamePadPlugin;
+use mouse::MousePlugin;
 
 /// # Examples
 ///
@@ -21,15 +21,19 @@ pub struct ThirdPersonCameraPlugin;
 
 impl Plugin for ThirdPersonCameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((MousePlugin, GamePadPlugin)).add_systems(
-            Update,
-            (
-                aim.run_if(aim_condition),
-                sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
-                toggle_x_offset.run_if(toggle_x_offset_condition),
-                toggle_cursor.run_if(toggle_cursor_condition),
-            ),
-        );
+        app.add_plugins((MousePlugin, GamePadPlugin))
+            .add_systems(
+                Update,
+                (
+                    aim.run_if(aim_condition),
+                    toggle_x_offset.run_if(toggle_x_offset_condition),
+                    toggle_cursor.run_if(toggle_cursor_condition),
+                ),
+            );
+            // .add_systems(
+            //     PostUpdate,
+            //     sync_player_camera.before(TransformSystem::TransformPropagate),
+            // );
     }
 }
 
@@ -260,7 +264,7 @@ impl Default for CustomGamepadSettings {
 #[derive(Component)]
 pub struct ThirdPersonCameraTarget;
 
-fn sync_player_camera(
+pub fn sync_player_camera(
     player_q: Query<&Transform, With<ThirdPersonCameraTarget>>,
     mut cam_q: Query<(&mut ThirdPersonCamera, &mut Transform), Without<ThirdPersonCameraTarget>>,
 ) {
