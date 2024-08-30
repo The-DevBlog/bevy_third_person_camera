@@ -18,3 +18,4 @@ bevy = { version = "0.14.1", default-features = false }
 
 [dev-dependencies]
 bevy = "0.14.1"
+avian3d = "0.1.2"
