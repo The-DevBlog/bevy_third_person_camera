@@ -1,3 +1,9 @@
+# v0.1.13
+
+## Improvements: 
+
+- Fix jitter that occurs when aiming
+
 # v0.1.12
 
 ## Improvements
