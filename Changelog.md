@@ -7,7 +7,7 @@
 ## Minor Changes
 
 - Update Bevy to latest version 0.14.2
-- Add bevy_rapier3d (for example purposes only)
+- Add bevy_rapier3d (dev dependency only)
 - Add physics example
 
 # v0.1.11
