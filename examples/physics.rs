@@ -1,30 +1,22 @@
-use avian3d::{
-    math::{AdjustPrecision, Quaternion, Scalar, Vector, PI},
-    prelude::*,
-    PhysicsPlugins,
-};
+/*
+Example displaying the integration with a third party physics engine. In this case Bevy Rapier 3d.
+The key is to run the CameraSyncSet AFTER the PhysicsSet, see line 19.
+*/
+
 use bevy::prelude::*;
+use bevy_rapier3d::prelude::*;
 use bevy_third_person_camera::*;
 
 fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins,
-            PhysicsPlugins::default(),
-            PhysicsDebugPlugin::default(),
-            ThirdPersonCameraPlugin, /* ADD THIS */
+            ThirdPersonCameraPlugin,
+            RapierPhysicsPlugin::<NoUserData>::default(),
         ))
         .add_systems(Startup, (spawn_player, spawn_world, spawn_camera))
-        .configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::Sync))
-        .add_systems(
-            Update,
-            (
-                player_movement,
-                apply_gravity,
-                apply_movement_damping,
-                kinematic_controller_collisions,
-            ),
-        )
+        .add_systems(Update, player_movement_keyboard)
+        .configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::StepSimulation)) // DO THIS!
         .run();
 }
 
@@ -32,107 +24,25 @@ fn main() {
 struct Player;
 
 #[derive(Component)]
-pub struct MovementAcceleration(pub Scalar);
-
-#[derive(Component)]
-pub struct MovementDampingFactor(pub Scalar);
-
-#[derive(Component)]
-pub struct JumpImpulse(pub Scalar);
-
-#[derive(Component)]
-pub struct ControllerGravity(pub Vector);
-
-#[derive(Component)]
-pub struct MaxSlopeAngle(pub Scalar);
-
-#[derive(Component)]
-pub struct CharacterController;
-
-#[derive(Bundle)]
-pub struct CharacterControllerBundle {
-    character_controller: CharacterController,
-    rigid_body: RigidBody,
-    collider: Collider,
-    ground_caster: ShapeCaster,
-    gravity: ControllerGravity,
-    movement: MovementBundle,
-}
-
-#[derive(Bundle)]
-pub struct MovementBundle {
-    acceleration: MovementAcceleration,
-    damping: MovementDampingFactor,
-    jump_impulse: JumpImpulse,
-    max_slope_angle: MaxSlopeAngle,
-}
-
-impl MovementBundle {
-    pub const fn new(
-        acceleration: Scalar,
-        damping: Scalar,
-        jump_impulse: Scalar,
-        max_slope_angle: Scalar,
-    ) -> Self {
-        Self {
-            acceleration: MovementAcceleration(acceleration),
-            damping: MovementDampingFactor(damping),
-            jump_impulse: JumpImpulse(jump_impulse),
-            max_slope_angle: MaxSlopeAngle(max_slope_angle),
-        }
-    }
-}
-
-impl Default for MovementBundle {
-    fn default() -> Self {
-        Self::new(10.0, 0.9, 7.0, PI * 0.45)
-    }
-}
-
-impl CharacterControllerBundle {
-    pub fn new(collider: Collider, gravity: Vector) -> Self {
-        let mut caster_shape = collider.clone();
-        caster_shape.set_scale(Vector::ONE * 0.99, 10);
-
-        Self {
-            character_controller: CharacterController,
-            rigid_body: RigidBody::Kinematic,
-            collider,
-            ground_caster: ShapeCaster::new(
-                caster_shape,
-                Vector::ZERO,
-                Quaternion::default(),
-                Dir3::NEG_Y,
-            )
-            .with_max_time_of_impact(0.1),
-            gravity: ControllerGravity(gravity),
-            movement: MovementBundle::default(),
-        }
-    }
-
-    pub fn with_movement(
-        mut self,
-        acceleration: Scalar,
-        damping: Scalar,
-        jump_impulse: Scalar,
-        max_slope_angle: Scalar,
-    ) -> Self {
-        self.movement = MovementBundle::new(acceleration, damping, jump_impulse, max_slope_angle);
-        self
-    }
-}
+struct Speed(f32);
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let player = (
         SceneBundle {
             scene: assets.load("Player.gltf#Scene0"),
+            transform: Transform::from_xyz(0.0, 1.0, 0.0),
             ..default()
         },
+        Collider::cuboid(0.25, 0.5, 0.25),
+        RigidBody::Dynamic,
+        Damping {
+            linear_damping: 5.0,
+            ..default()
+        },
+        ExternalImpulse::default(),
         Player,
-        ThirdPersonCameraTarget, // ADD THIS
-        LinearVelocity::default(),
-        CharacterControllerBundle::new(Collider::capsule(0.4, 0.3), Vector::NEG_Y * 9.81)
-            .with_movement(25.0, 0.8, 5.0, (40.0 as Scalar).to_radians()),
+        ThirdPersonCameraTarget,
+        Speed(4.0),
     );
 
     commands.spawn(player);
@@ -144,7 +54,17 @@ fn spawn_camera(mut commands: Commands) {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
-        ThirdPersonCamera::default(), // ADD THIS
+        ThirdPersonCamera {
+            aim_enabled: true,
+            aim_speed: 3.0, // default
+            aim_zoom: 0.7,  // default
+            offset_enabled: true,
+            offset_toggle_enabled: true,
+            gamepad_settings: CustomGamepadSettings { ..default() },
+            zoom_enabled: true,        // default
+            zoom: Zoom::new(1.5, 3.0), // default
+            ..default()
+        },
     );
     commands.spawn(camera);
 }
@@ -152,17 +72,16 @@ fn spawn_camera(mut commands: Commands) {
 fn spawn_world(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = (
         PbrBundle {
             mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
             material: materials.add(Color::srgb(0.11, 0.27, 0.16)),
-            transform: Transform::from_translation(Vec3::new(0.0, -4.0, 0.0)),
             ..default()
         },
-        RigidBody::Static,
-        Collider::cuboid(15.0, 0.4, 15.0),
+        Collider::cuboid(15.0 / 2.0, 0.0 / 2.0, 15.0 / 2.0),
     );
 
     let light = PointLightBundle {
@@ -178,13 +97,13 @@ fn spawn_world(
     commands.spawn(light);
 }
 
-fn player_movement(
+fn player_movement_keyboard(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
-    mut player_q: Query<(&mut Transform, &MovementAcceleration, &mut LinearVelocity), With<Player>>,
+    mut player_q: Query<(&mut ExternalImpulse, &mut Transform, &Speed), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ) {
-    for (mut player_transform, player_speed, mut vel) in player_q.iter_mut() {
+    for (mut ext_impulse, mut player_transform, player_speed) in player_q.iter_mut() {
         let cam = match cam_q.get_single() {
             Ok(c) => c,
             Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
@@ -212,145 +131,13 @@ fn player_movement(
             direction += *cam.right();
         }
 
+        direction.y = 0.0;
         let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
-        vel.0 += Vec3::new(movement.x, 0.0, movement.z);
+        ext_impulse.impulse += movement;
 
         // rotate player to face direction he is currently moving
         if direction.length_squared() > 0.0 {
-            player_transform.look_to(
-                Vec3::new(direction.x, 0.0, direction.z),
-                Vec3::Y,
-            );
-        }
-    }
-}
-
-pub fn apply_gravity(
-    mut controllers: Query<(&mut LinearVelocity, &ControllerGravity)>,
-    time: Res<Time>,
-) {
-    let delta_time = time.delta_seconds_f64().adjust_precision();
-
-    for (mut linear_velocity, gravity) in &mut controllers {
-        linear_velocity.0 += gravity.0 * delta_time;
-    }
-}
-
-pub fn apply_movement_damping(mut query: Query<(&MovementDampingFactor, &mut LinearVelocity)>) {
-    for (damping_factor, mut linear_velocity) in &mut query {
-        linear_velocity.x *= damping_factor.0;
-        linear_velocity.z *= damping_factor.0;
-    }
-}
-
-#[allow(clippy::type_complexity)]
-pub fn kinematic_controller_collisions(
-    collisions: Res<Collisions>,
-    bodies: Query<&RigidBody>,
-    collider_parents: Query<&ColliderParent, Without<Sensor>>,
-    mut character_controllers: Query<
-        (
-            &mut Position,
-            &Rotation,
-            &mut LinearVelocity,
-            Option<&MaxSlopeAngle>,
-        ),
-        (With<RigidBody>, With<CharacterController>),
-    >,
-    time: Res<Time>,
-) {
-    for contacts in collisions.iter() {
-        let Ok([collider_parent1, collider_parent2]) =
-            collider_parents.get_many([contacts.entity1, contacts.entity2])
-        else {
-            continue;
-        };
-
-        let is_first: bool;
-        let character_rb: RigidBody;
-        let is_other_dynamic: bool;
-
-        let (mut position, rotation, mut linear_velocity, max_slope_angle) =
-            if let Ok(character) = character_controllers.get_mut(collider_parent1.get()) {
-                is_first = true;
-                character_rb = *bodies.get(collider_parent1.get()).unwrap();
-                is_other_dynamic = bodies
-                    .get(collider_parent2.get())
-                    .is_ok_and(|rb| rb.is_dynamic());
-                character
-            } else if let Ok(character) = character_controllers.get_mut(collider_parent2.get()) {
-                is_first = false;
-                character_rb = *bodies.get(collider_parent2.get()).unwrap();
-                is_other_dynamic = bodies
-                    .get(collider_parent1.get())
-                    .is_ok_and(|rb| rb.is_dynamic());
-                character
-            } else {
-                continue;
-            };
-
-        if !character_rb.is_kinematic() {
-            continue;
-        }
-
-        for manifold in contacts.manifolds.iter() {
-            let normal = if is_first {
-                -manifold.global_normal1(rotation)
-            } else {
-                -manifold.global_normal2(rotation)
-            };
-
-            let mut deepest_penetration: Scalar = Scalar::MIN;
-
-            for contact in manifold.contacts.iter() {
-                if contact.penetration > 0.0 {
-                    position.0 += normal * contact.penetration;
-                }
-                deepest_penetration = deepest_penetration.max(contact.penetration);
-            }
-
-            if is_other_dynamic {
-                continue;
-            }
-
-            let slope_angle = normal.angle_between(Vector::Y);
-            let climbable = max_slope_angle.is_some_and(|angle| slope_angle.abs() <= angle.0);
-
-            if deepest_penetration > 0.0 {
-                if climbable {
-                    let normal_direction_xz =
-                        normal.reject_from_normalized(Vector::Y).normalize_or_zero();
-
-                    let linear_velocity_xz = linear_velocity.dot(normal_direction_xz);
-
-                    let max_y_speed = -linear_velocity_xz * slope_angle.tan();
-                    linear_velocity.y = linear_velocity.y.max(max_y_speed);
-                } else {
-                    if linear_velocity.dot(normal) > 0.0 {
-                        continue;
-                    }
-
-                    let impulse = linear_velocity.reject_from_normalized(normal);
-                    linear_velocity.0 = impulse;
-                }
-            } else {
-                let normal_speed = linear_velocity.dot(normal);
-
-                if normal_speed > 0.0 {
-                    continue;
-                }
-
-                let impulse_magnitude = normal_speed
-                    - (deepest_penetration / time.delta_seconds_f64().adjust_precision());
-                let mut impulse = impulse_magnitude * normal;
-
-                if climbable {
-                    linear_velocity.y -= impulse.y.min(0.0);
-                } else {
-                    impulse.y = impulse.y.max(0.0);
-                    linear_velocity.0 -= impulse;
-                }
-            }
+            player_transform.look_to(direction, Vec3::Y);
         }
     }
 }

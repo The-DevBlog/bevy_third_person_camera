@@ -1,17 +1,29 @@
-# v0.1.11 (not published)
+# v0.1.12
+
+## Improvements
+
+- Add support for using third party physics systems such as bevy rapier 3d, avian 3d, etc [KyWinston](https://github.com/KyWinston)
+
+## Minor Changes
+
+- Update Bevy to latest version 0.14.2
+- Add bevy_rapier3d (for example purposes only)
+- Add physics example
+
+# v0.1.11
 
 ## <ins>!Breaking Changes!<ins>
 
 View the [migration guide here](migrationGuides/v0.1.10-v0.1.11.md)
 
-- Completely removed the controller logic
+- Completely remove the controller logic
   - I regretted adding this initially. This has no place in the camera crate itself, as it serves a different purpose. I would like to keep this crate focused on the camera logic only going forward. Additionally, changing the translation itself is not how movement should be done.
-- Changed ThirdPersonCamera field 'mouse_sensitivity' type to Vec2
-- Replaced CameraGamepadSettings fields 'x_sensitivity' & 'y_sensitivity' fields with 'sensitivity' field with type Vec2
+- Change ThirdPersonCamera field 'mouse_sensitivity' type to Vec2
+- Replace CameraGamepadSettings fields 'x_sensitivity' & 'y_sensitivity' fields with 'sensitivity' field with type Vec2
 
 ## Minor Changes
 
-- Upgrade to Bevy v0.14.0 [KyleWinston](https://github.com/KyleWinston)
+- Upgrade to Bevy v0.14.0 [KyWinston](https://github.com/KyWinston)
 - Add documentation
 
 # v0.1.10
@@ -20,9 +32,9 @@ View the [migration guide here](migrationGuides/v0.1.10-v0.1.11.md)
 
 View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
-- Removed 'focus' field as it had zero effect
-- Renamed 'CustomGamepadSettings' to 'CameraGamepadSettings' for standardization
-- Moved 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module
+- Remove 'focus' field as it had zero effect
+- Rename 'CustomGamepadSettings' to 'CameraGamepadSettings' for standardization
+- Move 'CameraGamepadSettings', 'Offset' & 'Zoom' to 'Camera' module
 
 ## New Features
 
@@ -35,24 +47,24 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
 # v0.1.9
 
-- Updated Bevy to latest version 0.13.0 [KyleWinston](https://github.com/KyleWinston)
+- Update Bevy to latest version 0.13.0 [KyWinston](https://github.com/KyWinston)
 
 # v0.1.8
 
-- Updated Bevy to latest version 0.12.1
-- Updated Bevy dependency to disable bevy default features and add full feature set [shenjiangqiu](https://github.com/shenjiangqiu)
+- Update Bevy to latest version 0.12.1
+- Update Bevy dependency to disable bevy default features and add full feature set [shenjiangqiu](https://github.com/shenjiangqiu)
 
 # v0.1.7
 
-- Updated Bevy to latest version 0.12.0
+- Update Bevy to latest version 0.12.0
 
 # v0.1.6
 
-- Updated Bevy to latest version 0.11.3
+- Update Bevy to latest version 0.11.3
 
 ## Bug Fixes
 
-- Added an additional zoom condition so that zooming does not occur when the cursor lock is enabled - [Matthewwyndham](https://github.com/matthewwyndham)
+- Add an additional zoom condition so that zooming does not occur when the cursor lock is enabled - [Matthewwyndham](https://github.com/matthewwyndham)
 
 # v0.1.5
 
@@ -66,17 +78,17 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
 ## <ins>!Breaking Changes!</ins>
 
-- Renamed `enable_cursor_lock_toggle` to `cursor_lock_toggle_enabled` for standardization
-- Renamed `lock_cursor` to `cursor_lock_active` for standardization
-- Changed type of `aim_button` from `Some(MouseButton)` to `MouseButton` for simplicity
-- Changed type of `offset_toggle_key` from `Some(KeyCode)` to `KeyCode` for simplicity
-- Changed type of `CustomGamepadSettings.aim_button` from `Some(GamepadButton)` to `GamepadButton` for simplicity
-- Changed type of `CustomGamepadSettings.zoom_in_button` from `Some(GamepadButton)` to `GamepadButton` for simplicity
-- Changed type of `CustomGamepadSettings.zoom_out_button` from `Some(GamepadButton)` to `GamepadButton` for simplicity
+- Rename `enable_cursor_lock_toggle` to `cursor_lock_toggle_enabled` for standardization
+- Rename `lock_cursor` to `cursor_lock_active` for standardization
+- Change type of `aim_button` from `Some(MouseButton)` to `MouseButton` for simplicity
+- Change type of `offset_toggle_key` from `Some(KeyCode)` to `KeyCode` for simplicity
+- Change type of `CustomGamepadSettings.aim_button` from `Some(GamepadButton)` to `GamepadButton` for simplicity
+- Change type of `CustomGamepadSettings.zoom_in_button` from `Some(GamepadButton)` to `GamepadButton` for simplicity
+- Change type of `CustomGamepadSettings.zoom_out_button` from `Some(GamepadButton)` to `GamepadButton` for simplicity
 
 ## Minor Changes
 
-- Added `cursor_lock_toggle_enabled`, & `offset_toggle_enabled` to easily be able to turn on/off features
+- Add `cursor_lock_toggle_enabled`, & `offset_toggle_enabled` to easily be able to turn on/off features
 
 # v0.1.3
 
@@ -86,10 +98,10 @@ View the [migration guide here](migrationGuides/v0.1.9-v0.1.10.md)
 
 ## Minor Changes
 
-- Added `offset_enabled` to easily control if offset should be applied or not
+- Add `offset_enabled` to easily control if offset should be applied or not
 - Offset is now disabled by default
 - Conditions have been added to `toggle_x_offset`. Now that system will *only* run if `offset_enabled` is true
-- Added Changelog
+- Add Changelog
   
 ## New Features
 

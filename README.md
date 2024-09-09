@@ -61,6 +61,7 @@ That's it!
 
 - default
 - custom
+- physics
 
 ```
 cargo run --example <example name>
@@ -148,6 +149,15 @@ commands.spawn((
 ));
 ```
 
+## Physics Support
+
+When using third party physics engines such as bevy rapier 3d or avian 3d, you should force the 'sync_player_camera' system to run *after* the physics systems. To do this, add the following to your App::new() method (also see examples/physics.rs):
+
+```rust
+.configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::StepSimulation)) // Bevy Rapier 3d
+.configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::Sync)) // Avian 3d
+```
+
 ## Default Controls
 
 | Action             | Mouse/Keyboard      | Gamepad      | Enabled by Default |
@@ -163,7 +173,7 @@ commands.spawn((
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.14 | 0.1.11                   |
+| 0.14 | 0.1.11 - 0.1.12          |
 | 0.13 | 0.1.9 - 0.1.10           |
 | 0.12 | 0.1.7 - 0.1.8            |
 | 0.11 | 0.1.1 - 0.1.6            |
