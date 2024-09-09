@@ -5,8 +5,8 @@ use bevy::{
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
-use gamepad::{orbit_gamepad, GamePadPlugin};
-use mouse::{orbit_mouse, MousePlugin};
+use gamepad::GamePadPlugin;
+use mouse::MousePlugin;
 
 /// # Examples
 ///
@@ -19,17 +19,26 @@ use mouse::{orbit_mouse, MousePlugin};
 /// ```
 pub struct ThirdPersonCameraPlugin;
 
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CameraSyncSet;
+
 impl Plugin for ThirdPersonCameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((MousePlugin, GamePadPlugin)).add_systems(
-            Update,
-            (
-                aim.run_if(aim_condition),
-                sync_player_camera.after(orbit_mouse).after(orbit_gamepad),
-                toggle_x_offset.run_if(toggle_x_offset_condition),
-                toggle_cursor.run_if(toggle_cursor_condition),
-            ),
-        );
+        app.add_plugins((MousePlugin, GamePadPlugin))
+            .add_systems(
+                Update,
+                (
+                    aim.run_if(aim_condition),
+                    toggle_x_offset.run_if(toggle_x_offset_condition),
+                    toggle_cursor.run_if(toggle_cursor_condition),
+                ),
+            )
+            .add_systems(
+                PostUpdate,
+                sync_player_camera
+                    .before(TransformSystem::TransformPropagate)
+                    .in_set(CameraSyncSet),
+            );
     }
 }
 
