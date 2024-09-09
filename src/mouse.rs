@@ -12,14 +12,8 @@ pub struct MousePlugin;
 
 impl Plugin for MousePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (
-                orbit_mouse.run_if(orbit_condition),
-                zoom_mouse.run_if(zoom_condition),
-            )
-                .chain(),
-        );
+        app.add_systems(PreUpdate, orbit_mouse.run_if(orbit_condition))
+            .add_systems(Update, (zoom_mouse.run_if(zoom_condition),).chain());
     }
 }
 

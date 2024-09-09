@@ -12,10 +12,14 @@ pub struct GamePadPlugin;
 impl Plugin for GamePadPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
+            PreUpdate,
+            orbit_gamepad.run_if(resource_exists::<GamepadResource>),
+        )
+        .add_systems(
             Update,
             (
                 connections,
-                (orbit_gamepad, zoom_gamepad).run_if(resource_exists::<GamepadResource>),
+                zoom_gamepad.run_if(resource_exists::<GamepadResource>),
             ),
         );
     }
