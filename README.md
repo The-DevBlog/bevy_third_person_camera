@@ -151,7 +151,7 @@ commands.spawn((
 
 ## Physics Support
 
-When using third party physics engines such as bevy rapier 3d or avian 3d, you should force the 'sync_player_camera' system to run *after* the physics systems. To do this, add the following to your App::new() method (also see examples/physics.rs):
+When using third party physics engines such as bevy rapier 3d or avian 3d, you should force the 'sync_player_camera' system to run *after* the physics systems. Failing to do this will cause a jittering effect to occur when applying forces/impulses to an object that has a camera entity attached. Simply add the following to your App::new() method (also see examples/physics.rs for complete example):
 
 ```rust
 .configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::StepSimulation)) // Bevy Rapier 3d
