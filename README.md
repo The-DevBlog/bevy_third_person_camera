@@ -151,10 +151,11 @@ commands.spawn((
 
 ## Physics Support
 
-When using third party physics engines such as bevy rapier 3d or avion 3d, you should force the 'sync_player_camera' system to run *after* the physics systems. To do this, add the following to your App::new() method (also see examples/physics.rs):
+When using third party physics engines such as bevy rapier 3d or avian 3d, you should force the 'sync_player_camera' system to run *after* the physics systems. To do this, add the following to your App::new() method (also see examples/physics.rs):
 
 ```rust
-.configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::StepSimulation))
+.configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::StepSimulation)) // Bevy Rapier 3d
+.configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::Sync)) // Avian 3d
 ```
 
 ## Default Controls

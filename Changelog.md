@@ -2,7 +2,7 @@
 
 ## Improvements
 
-- Add support for using third party physics systems such as bevy rapier 3d, avion 3d, etc [KyWinston](https://github.com/KyWinston)
+- Add support for using third party physics systems such as bevy rapier 3d, avian 3d, etc [KyWinston](https://github.com/KyWinston)
 
 ## Minor Changes
 
