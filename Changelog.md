@@ -1,4 +1,4 @@
-# v0.1.14 (Pending)
+# v0.1.14
 
 ## Bug Fixes
 
