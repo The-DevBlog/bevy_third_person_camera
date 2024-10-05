@@ -1,3 +1,9 @@
+# v0.1.14 (Pending)
+
+## Bug Fixes
+
+- Fix panic when using the cursor unlock feature and then exiting the game window [Exepta](https://github.com/exepta)
+
 # v0.1.13
 
 ## Improvements: 
