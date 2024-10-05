@@ -205,8 +205,7 @@ pub struct GamepadResource(pub Gamepad);
 ///                aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
 ///                mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
 ///                offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
-///                x_sensitivity: 7.0,
-///                y_sensitivity: 4.0,
+///                sensitivity: Vec2::new(7.0, 4.0),
 ///                zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
 ///                zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
 ///            },
@@ -421,13 +420,14 @@ fn toggle_cursor(
         cam.cursor_lock_active = !cam.cursor_lock_active;
     }
 
-    let mut window = window_q.get_single_mut().unwrap();
-    if cam.cursor_lock_active {
-        window.cursor.grab_mode = CursorGrabMode::Locked;
-        window.cursor.visible = false;
-    } else {
-        window.cursor.grab_mode = CursorGrabMode::None;
-        window.cursor.visible = true;
+    if let Ok(mut window) = window_q.get_single_mut() {
+        if cam.cursor_lock_active {
+            window.cursor.grab_mode = CursorGrabMode::Locked;
+            window.cursor.visible = false;
+        } else {
+            window.cursor.grab_mode = CursorGrabMode::None;
+            window.cursor.visible = true;
+        }
     }
 }
 
