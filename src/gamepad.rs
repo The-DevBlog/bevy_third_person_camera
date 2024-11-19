@@ -32,10 +32,18 @@ fn connections(
 ) {
     for ev in gamepad_evr.read() {
         match &ev.connection {
-            Connected(_info) => {
+            Connected {
+                name: _info,
+                vendor_id,
+                product_id,
+            } => {
                 // if no gamepad is setup yet, use this one
                 if gamepad_res.is_none() {
-                    cmds.insert_resource(GamepadResource(Gamepad::new(0)));
+                    cmds.insert_resource(GamepadResource(Gamepad {
+                        vendor_id: *vendor_id,
+                        product_id: *product_id,
+                        ..default()
+                    }));
                 }
                 // println!("Gamepad connected");
             }
@@ -49,20 +57,13 @@ fn connections(
 
 pub fn zoom_gamepad(
     btns: Res<ButtonInput<GamepadButton>>,
-    gamepad_res: Option<Res<GamepadResource>>,
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
 ) {
-    let gamepad = if let Some(gp) = gamepad_res {
-        gp.0
-    } else {
-        return;
-    };
-
     if let Ok(mut cam) = cam_q.get_single_mut() {
         let gp = &cam.gamepad_settings;
 
-        let zoom_out = GamepadButton::new(gamepad, gp.zoom_out_button.button_type);
-        let zoom_in = GamepadButton::new(gamepad, gp.zoom_in_button.button_type);
+        let zoom_out = gp.zoom_out_button;
+        let zoom_in = gp.zoom_in_button;
 
         let mut new_radius = cam.zoom.radius;
 
@@ -82,15 +83,14 @@ pub fn orbit_gamepad(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
     btns: Res<ButtonInput<GamepadButton>>,
-    axis: Res<Axis<GamepadAxis>>,
     gamepad_res: Option<Res<GamepadResource>>,
 ) {
     // return gamepad if one is connected
-    let gamepad = if let Some(gp) = gamepad_res {
-        gp.0
-    } else {
+    if gamepad_res.is_none() {
         return;
     };
+
+    let gamepad = &gamepad_res.unwrap().0;
 
     let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
         return;
@@ -100,15 +100,14 @@ pub fn orbit_gamepad(
         return;
     }
 
-    let x_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickX);
-    let y_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickY);
+    let x_axis = gamepad.right_stick().x;
+    let y_axis = gamepad.right_stick().y;
 
     let deadzone = 0.5;
     let mut rotation = Vec2::ZERO;
-    if let (Some(x), Some(y)) = (axis.get(x_axis), axis.get(y_axis)) {
-        if x.abs() > deadzone || y.abs() > deadzone {
-            rotation = Vec2::new(x, y);
-        }
+    let (x, y) = (x_axis, y_axis);
+    if x.abs() > deadzone || y.abs() > deadzone {
+        rotation = Vec2::new(x, y);
     }
 
     if rotation.length_squared() > 0.0 {

@@ -28,11 +28,8 @@ struct Speed(f32);
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let player = (
-        SceneBundle {
-            scene: assets.load("Player.gltf#Scene0"),
-            transform: Transform::from_xyz(0.0, 1.0, 0.0),
-            ..default()
-        },
+        SceneRoot(assets.load("Player.gltf#Scene0")),
+        Transform::from_xyz(0.0, 1.0, 0.0),
         Collider::cuboid(0.25, 0.5, 0.25),
         RigidBody::Dynamic,
         Damping {
@@ -44,16 +41,13 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
         ThirdPersonCameraTarget,
         Speed(4.0),
     );
-
     commands.spawn(player);
 }
 
 fn spawn_camera(mut commands: Commands) {
     let camera = (
-        Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ThirdPersonCamera {
             aim_enabled: true,
             aim_speed: 3.0, // default
@@ -76,22 +70,18 @@ fn spawn_world(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = (
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0))),
-            material: materials.add(Color::srgb(0.11, 0.27, 0.16)),
-            ..default()
-        },
+        Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
+        MeshMaterial3d(materials.add(Color::srgb(0.11, 0.27, 0.16))),
         Collider::cuboid(15.0 / 2.0, 0.0 / 2.0, 15.0 / 2.0),
     );
 
-    let light = PointLightBundle {
-        point_light: PointLight {
+    let light = (
+        PointLight {
             intensity: 1500.0 * 1000.0,
             ..default()
         },
-        transform: Transform::from_xyz(0.0, 5.0, 0.0),
-        ..default()
-    };
+        Transform::from_xyz(0.0, 5.0, 0.0),
+    );
 
     commands.spawn(floor);
     commands.spawn(light);
@@ -132,7 +122,7 @@ fn player_movement_keyboard(
         }
 
         direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_seconds();
+        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_secs();
         ext_impulse.impulse += movement;
 
         // rotate player to face direction he is currently moving

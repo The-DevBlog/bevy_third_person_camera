@@ -239,14 +239,13 @@ pub struct CustomGamepadSettings {
 
 impl Default for CustomGamepadSettings {
     fn default() -> Self {
-        let gamepad = Gamepad::new(0);
         Self {
-            aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
-            mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
-            offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
+            aim_button: GamepadButton::LeftTrigger2,
+            mouse_orbit_button: GamepadButton::LeftTrigger,
+            offset_toggle_button: GamepadButton::DPadRight,
             sensitivity: Vec2::new(7.0, 4.0),
-            zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
-            zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
+            zoom_in_button: GamepadButton::DPadUp,
+            zoom_out_button: GamepadButton::DPadDown,
         }
     }
 }
@@ -336,7 +335,7 @@ fn aim(
         }
 
         let zoom_factor =
-            (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+            (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
 
         // stop zooming in if current radius is less than desired zoom
         if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
@@ -346,7 +345,7 @@ fn aim(
         }
     } else {
         if let Some(radius_copy) = cam.zoom.radius_copy {
-            let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+            let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
 
             // stop zooming out if current radius is greater than original radius
             if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
@@ -354,7 +353,7 @@ fn aim(
                 cam.zoom.radius_copy = None;
             } else {
                 cam.zoom.radius +=
-                    (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+                    (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
             }
         }
     }
@@ -403,7 +402,7 @@ fn toggle_x_offset(
     };
 
     // Update the offset based on the direction and time
-    cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_seconds())
+    cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_secs())
         .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
 }
 
@@ -422,11 +421,11 @@ fn toggle_cursor(
 
     if let Ok(mut window) = window_q.get_single_mut() {
         if cam.cursor_lock_active {
-            window.cursor.grab_mode = CursorGrabMode::Locked;
-            window.cursor.visible = false;
+            window.cursor_options.grab_mode = CursorGrabMode::Locked;
+            window.cursor_options.visible = false;
         } else {
-            window.cursor.grab_mode = CursorGrabMode::None;
-            window.cursor.visible = true;
+            window.cursor_options.grab_mode = CursorGrabMode::None;
+            window.cursor_options.visible = true;
         }
     }
 }
