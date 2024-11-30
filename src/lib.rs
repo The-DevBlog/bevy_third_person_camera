@@ -2,8 +2,7 @@ mod gamepad;
 mod mouse;
 
 use bevy::{
-    prelude::*,
-    window::{CursorGrabMode, PrimaryWindow},
+    input::gamepad::GamepadConnection, prelude::*, window::{CursorGrabMode, PrimaryWindow}
 };
 use gamepad::GamePadPlugin;
 use mouse::MousePlugin;
@@ -188,7 +187,7 @@ impl Offset {
 }
 
 #[derive(Resource)]
-pub struct GamepadResource(pub Gamepad);
+pub struct GamepadResource(pub GamepadConnection);
 
 /// Customizable gamepad settings
 ///

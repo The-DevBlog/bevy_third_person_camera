@@ -1,11 +1,7 @@
 use std::f32::consts::PI;
 
 use crate::{GamepadResource, ThirdPersonCamera};
-use bevy::{
-    input::gamepad::{GamepadConnection::*, *},
-    prelude::*,
-    window::PrimaryWindow,
-};
+use bevy::{input::gamepad::{GamepadConnection::{self, *}, GamepadConnectionEvent}, prelude::*, window::PrimaryWindow};
 
 pub struct GamePadPlugin;
 
@@ -33,18 +29,20 @@ fn connections(
     for ev in gamepad_evr.read() {
         match &ev.connection {
             Connected {
-                name: _info,
+                name: info,
                 vendor_id,
                 product_id,
             } => {
                 // if no gamepad is setup yet, use this one
                 if gamepad_res.is_none() {
-                    cmds.insert_resource(GamepadResource(Gamepad {
-                        vendor_id: *vendor_id,
-                        product_id: *product_id,
-                        ..default()
-                    }));
+                    cmds.spawn(Gamepad::default());
+                    cmds.insert_resource(GamepadResource(GamepadConnection::Connected {
+                        name: info.to_string(),
+                        vendor_id:*vendor_id,
+                        product_id:*product_id,
+                    }))
                 }
+
                 // println!("Gamepad connected");
             }
             Disconnected => {
@@ -82,7 +80,7 @@ pub fn zoom_gamepad(
 pub fn orbit_gamepad(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
-    btns: Res<ButtonInput<GamepadButton>>,
+    gamepad_q: Query<&Gamepad>,
     gamepad_res: Option<Res<GamepadResource>>,
 ) {
     // return gamepad if one is connected
@@ -90,13 +88,16 @@ pub fn orbit_gamepad(
         return;
     };
 
-    let gamepad = &gamepad_res.unwrap().0;
+    let Ok(gamepad) = &gamepad_q.get_single() else {
+        return;
+    };
 
     let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
         return;
     };
 
-    if cam.mouse_orbit_button_enabled && !btns.pressed(cam.gamepad_settings.mouse_orbit_button) {
+
+    if cam.mouse_orbit_button_enabled && !gamepad.pressed(cam.gamepad_settings.mouse_orbit_button) {
         return;
     }
 
