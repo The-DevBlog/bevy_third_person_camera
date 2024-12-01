@@ -25,7 +25,6 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
 fn spawn_camera(mut commands: Commands) {
     let camera = (
         Camera3d::default(),
-        Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ThirdPersonCamera {
             aim_enabled: true,
             aim_speed: 3.0, // default

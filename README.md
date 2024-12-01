@@ -35,7 +35,6 @@ Add the **ThirdPersonCamera** component to the camera entity:
 ```rust
 commands.spawn((
     Camera3d::default(),
-    Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ThirdPersonCamera::default(), 
 ));
 ```
@@ -143,7 +142,7 @@ commands.spawn((
         },
         ..default()
     },
-    Camera3dBundle::default(),
+    Camera3d::default(),
 ));
 ```
 
@@ -181,6 +180,7 @@ Refer to the [Changelog](Changelog.md) to view breaking changes and updates.
 
 ## Migration Guides
 
+- [v0.1.14 -> v0.2.0](migrationGuides/v0.1.14-v0.2.0.md)
 - [v0.1.10 -> v0.1.11](migrationGuides/v0.1.10-v0.1.11.md)
 - [v0.1.9 -> v0.1.10](migrationGuides/v0.1.9-v0.1.10.md)
 
