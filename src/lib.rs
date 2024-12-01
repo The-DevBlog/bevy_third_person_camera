@@ -2,6 +2,7 @@ mod gamepad;
 mod mouse;
 
 use bevy::{
+    input::gamepad::GamepadConnection,
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
@@ -188,7 +189,7 @@ impl Offset {
 }
 
 #[derive(Resource)]
-pub struct GamepadResource(pub Gamepad);
+pub struct GamepadResource(pub GamepadConnection);
 
 /// Customizable gamepad settings
 ///
@@ -239,14 +240,13 @@ pub struct CustomGamepadSettings {
 
 impl Default for CustomGamepadSettings {
     fn default() -> Self {
-        let gamepad = Gamepad::new(0);
         Self {
-            aim_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger2),
-            mouse_orbit_button: GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger),
-            offset_toggle_button: GamepadButton::new(gamepad, GamepadButtonType::DPadRight),
+            aim_button: GamepadButton::LeftTrigger2,
+            mouse_orbit_button: GamepadButton::LeftTrigger,
+            offset_toggle_button: GamepadButton::DPadRight,
             sensitivity: Vec2::new(7.0, 4.0),
-            zoom_in_button: GamepadButton::new(gamepad, GamepadButtonType::DPadUp),
-            zoom_out_button: GamepadButton::new(gamepad, GamepadButtonType::DPadDown),
+            zoom_in_button: GamepadButton::DPadUp,
+            zoom_out_button: GamepadButton::DPadDown,
         }
     }
 }
@@ -310,51 +310,54 @@ fn aim(
     >,
     mouse: Res<ButtonInput<MouseButton>>,
     mut player_q: Query<&mut Transform, With<ThirdPersonCameraTarget>>,
-    btns: Res<ButtonInput<GamepadButton>>,
+    btns: Query<&Gamepad>,
     time: Res<Time>,
 ) {
     let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else {
         return;
     };
 
-    // check if aim button was pressed
-    let aim_btn = mouse.pressed(cam.aim_button) || btns.pressed(cam.gamepad_settings.aim_button);
+    for btns in btns.iter() {
+        // check if aim button was pressed
+        let aim_btn =
+            mouse.pressed(cam.aim_button) || btns.pressed(cam.gamepad_settings.aim_button);
 
-    if aim_btn {
-        // rotate player or target to face direction he is aiming
-        let Ok(mut player_transform) = player_q.get_single_mut() else {
-            return;
-        };
-        player_transform.look_to(*cam_transform.forward(), Vec3::Y);
+        if aim_btn {
+            // rotate player or target to face direction he is aiming
+            let Ok(mut player_transform) = player_q.get_single_mut() else {
+                return;
+            };
+            player_transform.look_to(*cam_transform.forward(), Vec3::Y);
 
-        let desired_zoom = cam.zoom.min * cam.aim_zoom;
+            let desired_zoom = cam.zoom.min * cam.aim_zoom;
 
-        // radius_copy is used for restoring the radius (zoom) to it's
-        // original value after releasing the aim button
-        if cam.zoom.radius_copy.is_none() {
-            cam.zoom.radius_copy = Some(cam.zoom.radius);
-        }
+            // radius_copy is used for restoring the radius (zoom) to it's
+            // original value after releasing the aim button
+            if cam.zoom.radius_copy.is_none() {
+                cam.zoom.radius_copy = Some(cam.zoom.radius);
+            }
 
-        let zoom_factor =
-            (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+            let zoom_factor =
+                (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
 
-        // stop zooming in if current radius is less than desired zoom
-        if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
-            cam.zoom.radius = desired_zoom;
-        } else {
-            cam.zoom.radius -= zoom_factor;
-        }
-    } else {
-        if let Some(radius_copy) = cam.zoom.radius_copy {
-            let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
-
-            // stop zooming out if current radius is greater than original radius
-            if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
-                cam.zoom.radius = radius_copy;
-                cam.zoom.radius_copy = None;
+            // stop zooming in if current radius is less than desired zoom
+            if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
+                cam.zoom.radius = desired_zoom;
             } else {
-                cam.zoom.radius +=
-                    (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_seconds();
+                cam.zoom.radius -= zoom_factor;
+            }
+        } else {
+            if let Some(radius_copy) = cam.zoom.radius_copy {
+                let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
+
+                // stop zooming out if current radius is greater than original radius
+                if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
+                    cam.zoom.radius = radius_copy;
+                    cam.zoom.radius_copy = None;
+                } else {
+                    cam.zoom.radius +=
+                        (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
+                }
             }
         }
     }
@@ -380,16 +383,18 @@ fn toggle_x_offset(
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
     keys: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
-    btns: Res<ButtonInput<GamepadButton>>,
+    btns: Query<&Gamepad>,
 ) {
     let Ok(mut cam) = cam_q.get_single_mut() else {
         return;
     };
 
-    // check if toggle btn was pressed
-    let toggle_btn = keys.just_pressed(cam.offset_toggle_key)
-        || btns.just_pressed(cam.gamepad_settings.offset_toggle_button);
+    let mut toggle_btn: bool = keys.just_pressed(cam.offset_toggle_key);
 
+    for btns in btns.iter() {
+        // check if toggle btn was pressed
+        toggle_btn = toggle_btn || btns.just_pressed(cam.gamepad_settings.offset_toggle_button);
+    }
     if toggle_btn {
         // Switch direction by inverting the offset_flag
         cam.offset.is_transitioning = !cam.offset.is_transitioning;
@@ -403,7 +408,7 @@ fn toggle_x_offset(
     };
 
     // Update the offset based on the direction and time
-    cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_seconds())
+    cam.offset.offset.0 = (cam.offset.offset.0 + transition_speed * time.delta_secs())
         .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
 }
 
@@ -422,11 +427,11 @@ fn toggle_cursor(
 
     if let Ok(mut window) = window_q.get_single_mut() {
         if cam.cursor_lock_active {
-            window.cursor.grab_mode = CursorGrabMode::Locked;
-            window.cursor.visible = false;
+            window.cursor_options.grab_mode = CursorGrabMode::Locked;
+            window.cursor_options.visible = false;
         } else {
-            window.cursor.grab_mode = CursorGrabMode::None;
-            window.cursor.visible = true;
+            window.cursor_options.grab_mode = CursorGrabMode::None;
+            window.cursor_options.visible = true;
         }
     }
 }

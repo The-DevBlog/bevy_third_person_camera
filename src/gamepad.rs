@@ -2,7 +2,10 @@ use std::f32::consts::PI;
 
 use crate::{GamepadResource, ThirdPersonCamera};
 use bevy::{
-    input::gamepad::{GamepadConnection::*, *},
+    input::gamepad::{
+        GamepadConnection::{self, *},
+        GamepadConnectionEvent,
+    },
     prelude::*,
     window::PrimaryWindow,
 };
@@ -32,11 +35,21 @@ fn connections(
 ) {
     for ev in gamepad_evr.read() {
         match &ev.connection {
-            Connected(_info) => {
+            Connected {
+                name: info,
+                vendor_id,
+                product_id,
+            } => {
                 // if no gamepad is setup yet, use this one
                 if gamepad_res.is_none() {
-                    cmds.insert_resource(GamepadResource(Gamepad::new(0)));
+                    cmds.spawn(Gamepad::default());
+                    cmds.insert_resource(GamepadResource(GamepadConnection::Connected {
+                        name: info.to_string(),
+                        vendor_id: *vendor_id,
+                        product_id: *product_id,
+                    }))
                 }
+
                 // println!("Gamepad connected");
             }
             Disconnected => {
@@ -48,32 +61,27 @@ fn connections(
 }
 
 pub fn zoom_gamepad(
-    btns: Res<ButtonInput<GamepadButton>>,
-    gamepad_res: Option<Res<GamepadResource>>,
+    btns: Query<&Gamepad>,
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
 ) {
-    let gamepad = if let Some(gp) = gamepad_res {
-        gp.0
-    } else {
-        return;
-    };
-
     if let Ok(mut cam) = cam_q.get_single_mut() {
         let gp = &cam.gamepad_settings;
 
-        let zoom_out = GamepadButton::new(gamepad, gp.zoom_out_button.button_type);
-        let zoom_in = GamepadButton::new(gamepad, gp.zoom_in_button.button_type);
+        let zoom_out = gp.zoom_out_button;
+        let zoom_in = gp.zoom_in_button;
 
         let mut new_radius = cam.zoom.radius;
 
         // zoom out
-        if btns.pressed(zoom_out) {
-            new_radius += cam.zoom.radius * 0.01;
-            cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
-        // zoom in
-        } else if btns.pressed(zoom_in) {
-            new_radius -= cam.zoom.radius * 0.01;
-            cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
+        for btns in btns.iter() {
+            if btns.pressed(zoom_out) {
+                new_radius += cam.zoom.radius * 0.01;
+                cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
+            // zoom in
+            } else if btns.pressed(zoom_in) {
+                new_radius -= cam.zoom.radius * 0.01;
+                cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
+            }
         }
     }
 }
@@ -81,14 +89,11 @@ pub fn zoom_gamepad(
 pub fn orbit_gamepad(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
-    btns: Res<ButtonInput<GamepadButton>>,
-    axis: Res<Axis<GamepadAxis>>,
+    gamepad_q: Query<&Gamepad>,
     gamepad_res: Option<Res<GamepadResource>>,
 ) {
     // return gamepad if one is connected
-    let gamepad = if let Some(gp) = gamepad_res {
-        gp.0
-    } else {
+    if gamepad_res.is_none() {
         return;
     };
 
@@ -96,44 +101,47 @@ pub fn orbit_gamepad(
         return;
     };
 
-    if cam.mouse_orbit_button_enabled && !btns.pressed(cam.gamepad_settings.mouse_orbit_button) {
-        return;
-    }
+    for gamepad in gamepad_q.iter() {
+        if cam.mouse_orbit_button_enabled
+            && !gamepad.pressed(cam.gamepad_settings.mouse_orbit_button)
+        {
+            return;
+        }
 
-    let x_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickX);
-    let y_axis = GamepadAxis::new(gamepad, GamepadAxisType::RightStickY);
+        let x_axis = gamepad.right_stick().x;
+        let y_axis = gamepad.right_stick().y;
 
-    let deadzone = 0.5;
-    let mut rotation = Vec2::ZERO;
-    if let (Some(x), Some(y)) = (axis.get(x_axis), axis.get(y_axis)) {
+        let deadzone = 0.5;
+        let mut rotation = Vec2::ZERO;
+        let (x, y) = (x_axis, y_axis);
         if x.abs() > deadzone || y.abs() > deadzone {
             rotation = Vec2::new(x, y);
         }
-    }
 
-    if rotation.length_squared() > 0.0 {
-        let window = window_q.get_single().unwrap();
-        let delta_x = {
-            let delta = rotation.x / window.width()
-                * std::f32::consts::PI
-                * 2.0
-                * cam.gamepad_settings.sensitivity.x;
-            delta
-        };
-        let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.sensitivity.y;
-        let yaw = Quat::from_rotation_y(-delta_x);
-        let pitch = Quat::from_rotation_x(-delta_y);
-        cam_transform.rotation = yaw * cam_transform.rotation; // rotate around global y axis
+        if rotation.length_squared() > 0.0 {
+            let window = window_q.get_single().unwrap();
+            let delta_x = {
+                let delta = rotation.x / window.width()
+                    * std::f32::consts::PI
+                    * 2.0
+                    * cam.gamepad_settings.sensitivity.x;
+                delta
+            };
+            let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.sensitivity.y;
+            let yaw = Quat::from_rotation_y(-delta_x);
+            let pitch = Quat::from_rotation_x(-delta_y);
+            cam_transform.rotation = yaw * cam_transform.rotation; // rotate around global y axis
 
-        let new_rotation = cam_transform.rotation * pitch;
+            let new_rotation = cam_transform.rotation * pitch;
 
-        // check if new rotation will cause camera to go beyond the 180 degree vertical bounds
-        let up_vector = new_rotation * Vec3::Y;
-        if up_vector.y > 0.0 {
-            cam_transform.rotation = new_rotation;
+            // check if new rotation will cause camera to go beyond the 180 degree vertical bounds
+            let up_vector = new_rotation * Vec3::Y;
+            if up_vector.y > 0.0 {
+                cam_transform.rotation = new_rotation;
+            }
         }
-    }
 
-    let rot_matrix = Mat3::from_quat(cam_transform.rotation);
-    cam_transform.translation = rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
+        let rot_matrix = Mat3::from_quat(cam_transform.rotation);
+        cam_transform.translation = rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
+    }
 }
