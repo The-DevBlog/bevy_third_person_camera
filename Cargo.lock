@@ -1690,7 +1690,6 @@ version = "0.1.14"
 dependencies = [
  "bevy 0.15.0",
  "bevy_rapier3d",
- "wasm-bindgen",
 ]
 
 [[package]]

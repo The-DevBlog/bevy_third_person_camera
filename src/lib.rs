@@ -2,7 +2,6 @@ mod gamepad;
 mod mouse;
 
 use bevy::{
-    input::gamepad::GamepadConnection,
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
@@ -188,9 +187,6 @@ impl Offset {
     }
 }
 
-#[derive(Resource)]
-pub struct GamepadResource(pub GamepadConnection);
-
 /// Customizable gamepad settings
 ///
 /// # Examples
@@ -310,54 +306,61 @@ fn aim(
     >,
     mouse: Res<ButtonInput<MouseButton>>,
     mut player_q: Query<&mut Transform, With<ThirdPersonCameraTarget>>,
-    btns: Query<&Gamepad>,
+    gamepad_q: Query<&Gamepad>,
     time: Res<Time>,
 ) {
     let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else {
         return;
     };
 
-    for btns in btns.iter() {
-        // check if aim button was pressed
-        let aim_btn =
-            mouse.pressed(cam.aim_button) || btns.pressed(cam.gamepad_settings.aim_button);
+    let Ok(mut player_transform) = player_q.get_single_mut() else {
+        return;
+    };
 
-        if aim_btn {
-            // rotate player or target to face direction he is aiming
-            let Ok(mut player_transform) = player_q.get_single_mut() else {
-                return;
-            };
-            player_transform.look_to(*cam_transform.forward(), Vec3::Y);
+    let gamepad = match gamepad_q.get_single() {
+        Ok(value) => Some(value),
+        Err(_) => None,
+    };
 
-            let desired_zoom = cam.zoom.min * cam.aim_zoom;
+    let is_gamepad_aiming = match gamepad {
+        Some(gp) => gp.pressed(cam.gamepad_settings.aim_button),
+        None => false,
+    };
 
-            // radius_copy is used for restoring the radius (zoom) to it's
-            // original value after releasing the aim button
-            if cam.zoom.radius_copy.is_none() {
-                cam.zoom.radius_copy = Some(cam.zoom.radius);
-            }
+    // check if aim button was pressed
+    let is_mouse_aiming = mouse.pressed(cam.aim_button);
 
-            let zoom_factor =
-                (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
+    if is_mouse_aiming || is_gamepad_aiming {
+        // rotate player or target to face direction he is aiming
+        player_transform.look_to(*cam_transform.forward(), Vec3::Y);
 
-            // stop zooming in if current radius is less than desired zoom
-            if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
-                cam.zoom.radius = desired_zoom;
-            } else {
-                cam.zoom.radius -= zoom_factor;
-            }
+        let desired_zoom = cam.zoom.min * cam.aim_zoom;
+
+        // radius_copy is used for restoring the radius (zoom) to it's
+        // original value after releasing the aim button
+        if cam.zoom.radius_copy.is_none() {
+            cam.zoom.radius_copy = Some(cam.zoom.radius);
+        }
+
+        let zoom_factor =
+            (cam.zoom.radius_copy.unwrap() / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
+
+        // stop zooming in if current radius is less than desired zoom
+        if cam.zoom.radius <= desired_zoom || cam.zoom.radius - zoom_factor <= desired_zoom {
+            cam.zoom.radius = desired_zoom;
         } else {
-            if let Some(radius_copy) = cam.zoom.radius_copy {
-                let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
+            cam.zoom.radius -= zoom_factor;
+        }
+    } else {
+        if let Some(radius_copy) = cam.zoom.radius_copy {
+            let zoom_factor = (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
 
-                // stop zooming out if current radius is greater than original radius
-                if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
-                    cam.zoom.radius = radius_copy;
-                    cam.zoom.radius_copy = None;
-                } else {
-                    cam.zoom.radius +=
-                        (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
-                }
+            // stop zooming out if current radius is greater than original radius
+            if cam.zoom.radius >= radius_copy || cam.zoom.radius + zoom_factor >= radius_copy {
+                cam.zoom.radius = radius_copy;
+                cam.zoom.radius_copy = None;
+            } else {
+                cam.zoom.radius += (radius_copy / cam.aim_zoom) * cam.aim_speed * time.delta_secs();
             }
         }
     }
