@@ -24,7 +24,7 @@ Import the **bevy_third_person_camera** crate:
 use bevy_third_person_camera::*;
 ```
 
-Add the **ThirdPersonPlugin**: 
+Add the **ThirdPersonCameraPlugin**: 
 
 ```rust
 .add_plugins(ThirdPersonCameraPlugin)
