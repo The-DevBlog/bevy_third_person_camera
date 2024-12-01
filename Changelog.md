@@ -1,3 +1,11 @@
+# v0.2.0
+
+## <ins>!Breaking Changes!<ins>
+
+View the [migration guide here](migrationGuides/v0.1.14-v0.2.0.md)
+
+- Update to Bevy v0.15.0 [KyWinston](https://github.com/KyWinston)
+
 # v0.1.14
 
 ## Bug Fixes

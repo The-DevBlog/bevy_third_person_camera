@@ -34,8 +34,9 @@ Add the **ThirdPersonCamera** component to the camera entity:
 
 ```rust
 commands.spawn((
-    ThirdPersonCamera::default(),
-    Camera3dBundle::default()
+    Camera3d::default(),
+    Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ThirdPersonCamera::default(), 
 ));
 ```
 
@@ -44,12 +45,9 @@ Add the **ThirdPersonCameraTarget** component to your player:
 ```rust
 // Player
 commands.spawn((
-    PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
-        material: materials.add(Color::BLUE.into()),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..default()
-    },
+    Mesh3d(meshes.add(Mesh::from(Cuboid::new(1.0, 1.0, 1.0)))),
+    MeshMaterial3d(materials.add(Color::WHITE)),
+    Transform::from_translation(Vec3::new(0.0, 0.5, 0.0)),
     ThirdPersonCameraTarget,
     Player,
 ));
@@ -61,7 +59,7 @@ That's it!
 
 - default
 - custom
-- physics
+- physics # not working at the moment. Waiting for bevy_rapier3d to support Bevy v0.15.0
 
 ```
 cargo run --example <example name>
@@ -173,7 +171,7 @@ When using third party physics engines such as bevy rapier 3d or avian 3d, you s
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
-| 0.15 |
+| 0.15 | 0.2.0                    |
 | 0.14 | 0.1.11 - 0.1.14          |
 | 0.13 | 0.1.9 - 0.1.10           |
 | 0.12 | 0.1.7 - 0.1.8            |

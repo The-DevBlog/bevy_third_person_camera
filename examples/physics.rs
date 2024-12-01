@@ -72,7 +72,7 @@ fn spawn_world(
 
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let floor = (
+    let floor: (Mesh3d, MeshMaterial3d<StandardMaterial>, Collider) = (
         Mesh3d(meshes.add(Mesh::from(Plane3d::default().mesh().size(15.0, 15.0)))),
         MeshMaterial3d(materials.add(Color::srgb(0.11, 0.27, 0.16))),
         Collider::cuboid(15.0 / 2.0, 0.0 / 2.0, 15.0 / 2.0),
