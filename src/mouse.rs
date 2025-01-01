@@ -34,7 +34,7 @@ pub fn orbit_mouse(
 ) {
     let mut rotation = Vec2::ZERO;
     for ev in mouse_evr.read() {
-        rotation += ev.delta;
+        rotation = ev.delta;
     }
 
     let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
