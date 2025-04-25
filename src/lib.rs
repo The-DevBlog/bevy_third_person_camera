@@ -268,10 +268,10 @@ fn sync_player_camera(
     player_q: Query<&Transform, With<ThirdPersonCameraTarget>>,
     mut cam_q: Query<(&mut ThirdPersonCamera, &mut Transform), Without<ThirdPersonCameraTarget>>,
 ) {
-    let Ok(player) = player_q.get_single() else {
+    let Ok(player) = player_q.single() else {
         return;
     };
-    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
+    let Ok((cam, mut cam_transform)) = cam_q.single_mut() else {
         return;
     };
 
@@ -293,7 +293,7 @@ fn sync_player_camera(
 
 // only run aiming logic if `aim_enabled` is true
 fn aim_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
+    let Ok(cam) = cam_q.single() else {
         return false;
     };
     cam.aim_enabled
@@ -309,15 +309,15 @@ fn aim(
     gamepad_q: Query<&Gamepad>,
     time: Res<Time>,
 ) {
-    let Ok((mut cam, cam_transform)) = cam_q.get_single_mut() else {
+    let Ok((mut cam, cam_transform)) = cam_q.single_mut() else {
         return;
     };
 
-    let Ok(mut player_transform) = player_q.get_single_mut() else {
+    let Ok(mut player_transform) = player_q.single_mut() else {
         return;
     };
 
-    let gamepad = match gamepad_q.get_single() {
+    let gamepad = match gamepad_q.single() {
         Ok(value) => Some(value),
         Err(_) => None,
     };
@@ -367,7 +367,7 @@ fn aim(
 }
 
 pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
+    let Ok(cam) = cam_q.single() else {
         return false;
     };
     return cam.zoom_enabled && cam.cursor_lock_active;
@@ -375,7 +375,7 @@ pub fn zoom_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>)
 
 // only run toggle_x_offset if `offset_toggle_enabled` is true
 fn toggle_x_offset_condition(cam_q: Query<&ThirdPersonCamera, With<ThirdPersonCamera>>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
+    let Ok(cam) = cam_q.single() else {
         return false;
     };
     cam.offset_toggle_enabled
@@ -388,7 +388,7 @@ fn toggle_x_offset(
     time: Res<Time>,
     btns: Query<&Gamepad>,
 ) {
-    let Ok(mut cam) = cam_q.get_single_mut() else {
+    let Ok(mut cam) = cam_q.single_mut() else {
         return;
     };
 
@@ -420,7 +420,7 @@ fn toggle_cursor(
     keys: Res<ButtonInput<KeyCode>>,
     mut window_q: Query<&mut Window, With<PrimaryWindow>>,
 ) {
-    let Ok(mut cam) = cam_q.get_single_mut() else {
+    let Ok(mut cam) = cam_q.single_mut() else {
         return;
     };
 
@@ -428,7 +428,7 @@ fn toggle_cursor(
         cam.cursor_lock_active = !cam.cursor_lock_active;
     }
 
-    if let Ok(mut window) = window_q.get_single_mut() {
+    if let Ok(mut window) = window_q.single_mut() {
         if cam.cursor_lock_active {
             window.cursor_options.grab_mode = CursorGrabMode::Locked;
             window.cursor_options.visible = false;
@@ -441,7 +441,7 @@ fn toggle_cursor(
 
 // checks if the toggle cursor functionality is enabled
 fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
+    let Ok(cam) = cam_q.single() else {
         return true;
     };
     cam.cursor_lock_toggle_enabled

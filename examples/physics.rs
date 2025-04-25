@@ -94,7 +94,7 @@ fn player_movement_keyboard(
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ) {
     for (mut ext_impulse, mut player_transform, player_speed) in player_q.iter_mut() {
-        let cam = match cam_q.get_single() {
+        let cam = match cam_q.single() {
             Ok(c) => c,
             Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
         };

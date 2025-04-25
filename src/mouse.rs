@@ -37,7 +37,7 @@ pub fn orbit_mouse(
         rotation = ev.delta;
     }
 
-    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
+    let Ok((cam, mut cam_transform)) = cam_q.single_mut() else {
         return;
     };
 
@@ -79,7 +79,7 @@ fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut Thi
         scroll += ev.y;
     }
 
-    if let Ok(mut cam) = cam_q.get_single_mut() {
+    if let Ok(mut cam) = cam_q.single_mut() {
         if scroll.abs() > 0.0 {
             let new_radius =
                 cam.zoom.radius - scroll * cam.zoom.radius * 0.1 * cam.zoom_sensitivity;
