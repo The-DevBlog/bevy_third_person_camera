@@ -1,3 +1,5 @@
+// NOTE: This example does not work at the moment. Waiting for rapier to update to latest bevy version.
+
 /*
 Example displaying the integration with a third party physics engine. In this case Bevy Rapier 3d.
 The key is to run the CameraSyncSet AFTER the PhysicsSet, see line 19.
@@ -94,7 +96,7 @@ fn player_movement_keyboard(
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ) {
     for (mut ext_impulse, mut player_transform, player_speed) in player_q.iter_mut() {
-        let cam = match cam_q.get_single() {
+        let cam = match cam_q.single() {
             Ok(c) => c,
             Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
         };

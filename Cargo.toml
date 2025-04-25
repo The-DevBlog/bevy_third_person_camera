@@ -1,6 +1,6 @@
 [package]
 name = "bevy_third_person_camera"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "A third person camera written for Bevy"
 keywords = ["bevy", "camera", "orbit", "gamedev"]
@@ -14,10 +14,8 @@ exclude = ["assets/*", "migrationGuides/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.15.0", default-features = false, features = [
-    "bevy_window",
-] }
+bevy = { version = "0.16.0", default-features = false, features = ["bevy_window"] }
 
 [dev-dependencies]
-bevy = "0.15.0"
-bevy_rapier3d = "0.28.0"
+bevy = "0.16.0"
+bevy_rapier3d = "0.29.0"

@@ -19,7 +19,7 @@ impl Plugin for MousePlugin {
 
 // only run the orbit system if the cursor lock is disabled
 fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
-    let Ok(cam) = cam_q.get_single() else {
+    let Ok(cam) = cam_q.single() else {
         return true;
     };
     return cam.cursor_lock_active;
@@ -37,7 +37,7 @@ pub fn orbit_mouse(
         rotation = ev.delta;
     }
 
-    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
+    let Ok((cam, mut cam_transform)) = cam_q.single_mut() else {
         return;
     };
 
@@ -48,7 +48,7 @@ pub fn orbit_mouse(
     rotation *= cam.sensitivity;
 
     if rotation.length_squared() > 0.0 {
-        let window = window_q.get_single().unwrap();
+        let window = window_q.single().unwrap();
         let delta_x = {
             let delta = rotation.x / window.width() * std::f32::consts::PI * cam.sensitivity.x;
             delta
@@ -79,7 +79,7 @@ fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut Thi
         scroll += ev.y;
     }
 
-    if let Ok(mut cam) = cam_q.get_single_mut() {
+    if let Ok(mut cam) = cam_q.single_mut() {
         if scroll.abs() > 0.0 {
             let new_radius =
                 cam.zoom.radius - scroll * cam.zoom.radius * 0.1 * cam.zoom_sensitivity;

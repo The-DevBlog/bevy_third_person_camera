@@ -35,7 +35,7 @@ pub fn zoom_gamepad(
     btns: Query<&Gamepad>,
     mut cam_q: Query<&mut ThirdPersonCamera, With<ThirdPersonCamera>>,
 ) {
-    if let Ok(mut cam) = cam_q.get_single_mut() {
+    if let Ok(mut cam) = cam_q.single_mut() {
         let gp = &cam.gamepad_settings;
 
         let zoom_out = gp.zoom_out_button;
@@ -62,11 +62,11 @@ pub fn orbit_gamepad(
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
     gamepad_q: Query<&Gamepad>,
 ) {
-    let Ok((cam, mut cam_transform)) = cam_q.get_single_mut() else {
+    let Ok((cam, mut cam_transform)) = cam_q.single_mut() else {
         return;
     };
 
-    let Ok(gamepad) = gamepad_q.get_single() else {
+    let Ok(gamepad) = gamepad_q.single() else {
         return;
     };
 
@@ -85,7 +85,7 @@ pub fn orbit_gamepad(
     }
 
     if rotation.length_squared() > 0.0 {
-        let window = window_q.get_single().unwrap();
+        let window = window_q.single().unwrap();
         let delta_x = {
             let delta = rotation.x / window.width()
                 * std::f32::consts::PI
