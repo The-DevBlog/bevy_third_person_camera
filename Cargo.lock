@@ -1076,6 +1076,7 @@ dependencies = [
  "bevy_log 0.15.1",
  "bevy_math 0.15.1",
  "bevy_pbr 0.15.1",
+ "bevy_picking 0.15.1",
  "bevy_ptr 0.15.3",
  "bevy_reflect 0.15.1",
  "bevy_render 0.15.1",
@@ -1111,7 +1112,7 @@ dependencies = [
  "bevy_log 0.16.0",
  "bevy_math 0.16.0",
  "bevy_pbr 0.16.0",
- "bevy_picking",
+ "bevy_picking 0.16.0",
  "bevy_platform",
  "bevy_ptr 0.16.0",
  "bevy_reflect 0.16.0",
@@ -1354,6 +1355,28 @@ dependencies = [
 
 [[package]]
 name = "bevy_picking"
+version = "0.15.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "125e0c7327ec155c566c044c6eefd1a02e904134fa5dc0ba54665e06a35297b0"
+dependencies = [
+ "bevy_app 0.15.1",
+ "bevy_asset 0.15.1",
+ "bevy_derive 0.15.3",
+ "bevy_ecs 0.15.1",
+ "bevy_hierarchy",
+ "bevy_input 0.15.1",
+ "bevy_math 0.15.1",
+ "bevy_reflect 0.15.1",
+ "bevy_render 0.15.1",
+ "bevy_time 0.15.1",
+ "bevy_transform 0.15.1",
+ "bevy_utils 0.15.3",
+ "bevy_window 0.15.1",
+ "uuid",
+]
+
+[[package]]
+name = "bevy_picking"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f73674f62b1033006bd75c89033f5d3516386cfd7d43bb9f7665012c0ab14d22"
@@ -1409,9 +1432,9 @@ checksum = "86f1275dfb4cfef4ffc90c3fa75408964864facf833acc932413d52aa5364ba4"
 
 [[package]]
 name = "bevy_rapier3d"
-version = "0.28.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65fff77c1e3140f8fa9d08632841f42cbef06e4ad98ba61d65a6297369bad763"
+checksum = "85f3856331b3f75e900db0fd47c34d7e63dc7f736f455e9d0e6d775a24099c37"
 dependencies = [
  "bevy 0.15.1",
  "bitflags 2.9.0",
@@ -1671,7 +1694,7 @@ dependencies = [
  "bevy_ecs 0.16.0",
  "bevy_image 0.16.0",
  "bevy_math 0.16.0",
- "bevy_picking",
+ "bevy_picking 0.16.0",
  "bevy_platform",
  "bevy_reflect 0.16.0",
  "bevy_render 0.16.0",
@@ -1865,7 +1888,7 @@ dependencies = [
  "bevy_image 0.16.0",
  "bevy_input 0.16.0",
  "bevy_math 0.16.0",
- "bevy_picking",
+ "bevy_picking 0.16.0",
  "bevy_platform",
  "bevy_reflect 0.16.0",
  "bevy_render 0.16.0",
@@ -4131,9 +4154,9 @@ dependencies = [
 
 [[package]]
 name = "parry3d"
-version = "0.17.5"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5d6c81f7d291d5ba572951242779a672f73ed605fe5520045c0bccdb381e913"
+checksum = "ecb572cea5c76b06bc744aaefdbb9e6ea9e5695f50f79c0227bddecd6ec925a4"
 dependencies = [
  "approx",
  "arrayvec",
@@ -4332,6 +4355,19 @@ name = "profiling"
 version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "afbdc74edc00b6f6a218ca6a5364d6226a259d4b8ea1af4a0ea063f27e179f4d"
+dependencies = [
+ "profiling-procmacros",
+]
+
+[[package]]
+name = "profiling-procmacros"
+version = "1.0.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a65f2e60fbf1063868558d69c6beacf412dc755f9fc020f514b7955fc914fe30"
+dependencies = [
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "quote"
@@ -4408,9 +4444,9 @@ checksum = "f60fcc7d6849342eff22c4350c8b9a989ee8ceabc4b481253e8946b9fe83d684"
 
 [[package]]
 name = "rapier3d"
-version = "0.22.0"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87360935d1a54802efe0ddf908489436bb49c84865c36c930131843c7b1dc97d"
+checksum = "37d84644f385b81f065576058bc8f7e3d64e56a66f2f5fc40bfd917774659e12"
 dependencies = [
  "approx",
  "arrayvec",
@@ -4424,6 +4460,7 @@ dependencies = [
  "num-traits",
  "ordered-float",
  "parry3d",
+ "profiling",
  "rustc-hash 2.1.1",
  "simba",
  "thiserror 1.0.69",
