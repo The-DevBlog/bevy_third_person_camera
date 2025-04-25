@@ -1,3 +1,5 @@
+// NOTE: This example does not work at the moment. Waiting for rapier to update to latest bevy version.
+
 /*
 Example displaying the integration with a third party physics engine. In this case Bevy Rapier 3d.
 The key is to run the CameraSyncSet AFTER the PhysicsSet, see line 19.
