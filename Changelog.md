@@ -1,3 +1,14 @@
+# v0.3.0
+
+- Add semantic versioning
+
+Contributors: 
+- https://github.com/Leinnan
+
+# v0.2.1
+
+- Update to Bevy v0.16
+
 # v0.2.0
 
 ## <ins>!Breaking Changes!<ins>
