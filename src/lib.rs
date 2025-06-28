@@ -2,8 +2,7 @@ mod gamepad;
 mod mouse;
 
 use bevy::{
-    prelude::*,
-    window::{CursorGrabMode, PrimaryWindow},
+    prelude::*, window::{CursorGrabMode, PrimaryWindow}
 };
 use gamepad::GamePadPlugin;
 use mouse::MousePlugin;
@@ -22,6 +21,11 @@ pub struct ThirdPersonCameraPlugin;
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CameraSyncSet;
 
+#[derive(Event)]
+pub struct CursorLockEvent {
+    pub locked: bool,
+}
+
 impl Plugin for ThirdPersonCameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((MousePlugin, GamePadPlugin))
@@ -30,7 +34,11 @@ impl Plugin for ThirdPersonCameraPlugin {
                 (
                     aim.run_if(aim_condition),
                     toggle_x_offset.run_if(toggle_x_offset_condition),
-                    toggle_cursor.run_if(toggle_cursor_condition),
+                    //toggle_cursor.run_if(toggle_cursor_condition),
+                    handle_cursor_lock_events.run_if(
+                        toggle_cursor_condition,
+                    ),
+                    cursor_lock_toggle,
                 ),
             )
             .add_systems(
@@ -39,6 +47,7 @@ impl Plugin for ThirdPersonCameraPlugin {
                     .before(TransformSystem::TransformPropagate)
                     .in_set(CameraSyncSet),
             );
+        app.add_event::<CursorLockEvent>();
     }
 }
 
@@ -415,17 +424,55 @@ fn toggle_x_offset(
         .clamp(-cam.offset.offset_copy.0, cam.offset.offset_copy.0);
 }
 
-fn toggle_cursor(
+// fn toggle_cursor(
+//     mut cam_q: Query<&mut ThirdPersonCamera>,
+//     keys: Res<ButtonInput<KeyCode>>,
+//     mut window_q: Query<&mut Window, With<PrimaryWindow>>,
+// ) {
+//     let Ok(mut cam) = cam_q.single_mut() else {
+//         return;
+//     };
+
+//     if keys.just_pressed(cam.cursor_lock_key) {
+//         cam.cursor_lock_active = !cam.cursor_lock_active;
+//     }
+
+//     if let Ok(mut window) = window_q.single_mut() {
+//         if cam.cursor_lock_active {
+//             window.cursor_options.grab_mode = CursorGrabMode::Locked;
+//             window.cursor_options.visible = false;
+//         } else {
+//             window.cursor_options.grab_mode = CursorGrabMode::None;
+//             window.cursor_options.visible = true;
+//         }
+//     }
+// }
+
+// checks if the toggle cursor functionality is enabled
+fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
+    let Ok(cam) = cam_q.single() else {
+        return true;
+    };
+    cam.cursor_lock_toggle_enabled
+}
+
+fn handle_cursor_lock_events(
+    mut events: EventReader<CursorLockEvent>,
     mut cam_q: Query<&mut ThirdPersonCamera>,
-    keys: Res<ButtonInput<KeyCode>>,
     mut window_q: Query<&mut Window, With<PrimaryWindow>>,
 ) {
     let Ok(mut cam) = cam_q.single_mut() else {
         return;
     };
 
-    if keys.just_pressed(cam.cursor_lock_key) {
-        cam.cursor_lock_active = !cam.cursor_lock_active;
+    if events.len() > 1 {
+        warn!("Multiple CursorLockEvent detected");
+    }
+
+    // Ensure there is a single event to process
+    for event in events.read() {
+        info!("CursorLockEvent: locked={}", event.locked);
+        cam.cursor_lock_active = event.locked;
     }
 
     if let Ok(mut window) = window_q.single_mut() {
@@ -439,10 +486,18 @@ fn toggle_cursor(
     }
 }
 
-// checks if the toggle cursor functionality is enabled
-fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
+pub fn cursor_lock_toggle(
+    mut events_q: EventWriter<CursorLockEvent>,
+    keys: Res<ButtonInput<KeyCode>>,
+    cam_q: Query<&ThirdPersonCamera>,
+) {
     let Ok(cam) = cam_q.single() else {
-        return true;
+        return;
     };
-    cam.cursor_lock_toggle_enabled
+
+    if keys.just_pressed(cam.cursor_lock_key) {
+        events_q.write(CursorLockEvent {
+            locked: !cam.cursor_lock_active,
+        });
+    }
 }
