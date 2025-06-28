@@ -2,8 +2,7 @@ mod gamepad;
 mod mouse;
 
 use bevy::{
-    prelude::*,
-    window::{CursorGrabMode, PrimaryWindow},
+    prelude::*, window::{CursorGrabMode, PrimaryWindow}
 };
 use gamepad::GamePadPlugin;
 use mouse::MousePlugin;
@@ -23,8 +22,8 @@ pub struct ThirdPersonCameraPlugin;
 pub struct CameraSyncSet;
 
 #[derive(Event)]
-pub struct CursorVisibilityEvent {
-    visible: bool,
+pub struct CursorLockEvent {
+    pub locked: bool,
 }
 
 impl Plugin for ThirdPersonCameraPlugin {
@@ -36,10 +35,10 @@ impl Plugin for ThirdPersonCameraPlugin {
                     aim.run_if(aim_condition),
                     toggle_x_offset.run_if(toggle_x_offset_condition),
                     //toggle_cursor.run_if(toggle_cursor_condition),
-                    handle_cursor_visibility_events.run_if(
+                    handle_cursor_lock_events.run_if(
                         toggle_cursor_condition,
                     ),
-                    cursor_visibility_toggle,
+                    cursor_lock_toggle,
                 ),
             )
             .add_systems(
@@ -48,7 +47,7 @@ impl Plugin for ThirdPersonCameraPlugin {
                     .before(TransformSystem::TransformPropagate)
                     .in_set(CameraSyncSet),
             );
-        app.add_event::<CursorVisibilityEvent>();
+        app.add_event::<CursorLockEvent>();
     }
 }
 
@@ -457,8 +456,8 @@ fn toggle_cursor_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
     cam.cursor_lock_toggle_enabled
 }
 
-fn handle_cursor_visibility_events(
-    mut events_q: EventReader<CursorVisibilityEvent>,
+fn handle_cursor_lock_events(
+    mut events: EventReader<CursorLockEvent>,
     mut cam_q: Query<&mut ThirdPersonCamera>,
     mut window_q: Query<&mut Window, With<PrimaryWindow>>,
 ) {
@@ -466,11 +465,15 @@ fn handle_cursor_visibility_events(
         return;
     };
 
-    let Ok(mut event) = events_q.single_mut() else {
-        return;
-    };
+    if events.len() > 1 {
+        warn!("Multiple CursorLockEvent detected");
+    }
 
-    cam.cursor_lock_active = event.visible;
+    // Ensure there is a single event to process
+    for event in events.read() {
+        info!("CursorLockEvent: locked={}", event.locked);
+        cam.cursor_lock_active = event.locked;
+    }
 
     if let Ok(mut window) = window_q.single_mut() {
         if cam.cursor_lock_active {
@@ -483,8 +486,8 @@ fn handle_cursor_visibility_events(
     }
 }
 
-fn cursor_visibility_toggle(
-    mut events_q: EventWriter<CursorVisibilityEvent>,
+pub fn cursor_lock_toggle(
+    mut events_q: EventWriter<CursorLockEvent>,
     keys: Res<ButtonInput<KeyCode>>,
     cam_q: Query<&ThirdPersonCamera>,
 ) {
@@ -493,8 +496,8 @@ fn cursor_visibility_toggle(
     };
 
     if keys.just_pressed(cam.cursor_lock_key) {
-        events_q.send(CursorVisibilityEvent {
-            visible: !cam.cursor_lock_active,
+        events_q.write(CursorLockEvent {
+            locked: !cam.cursor_lock_active,
         });
     }
 }
