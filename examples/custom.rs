@@ -43,7 +43,6 @@ fn spawn_camera(mut commands: Commands) {
 fn spawn_world(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = (

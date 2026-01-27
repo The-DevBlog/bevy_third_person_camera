@@ -90,6 +90,7 @@ aim_zoom: 0.7, // default
 aim_button: Some(MouseButton::Right), // default
 zoom: Zoom::new(1.5, 3.0)
 ```
+
 ![aim demo](assets/aimDemo.gif)
 
 ### Cursor Lock
@@ -101,6 +102,7 @@ cursor_lock_toggle_enabled: true,
 cursor_lock_active: true,
 cursor_lock_key: KeyCode::Space,
 ```
+
 ![cursor lock demo](assets/cursorLockDemo.gif)
 
 ### Orbit
@@ -158,7 +160,7 @@ When using third party physics engines such as bevy rapier 3d or avian 3d, you s
 ## Default Controls
 
 | Action             | Mouse/Keyboard      | Gamepad      | Enabled by Default |
-| ------------------ | ------------------- | ------------ | ------------------ |
+|--------------------|---------------------|--------------|--------------------|
 | Zoom In            | Scroll Up           | D Pad Up     | Yes                |
 | Zoom Out           | Scroll Down         | D Pad Down   | Yes                |
 | Aim                | Right Mouse Button  | Left Trigger | No                 |
@@ -169,7 +171,8 @@ When using third party physics engines such as bevy rapier 3d or avian 3d, you s
 ## Bevy Version Compatibility
 
 | bevy | bevy_third_person_camera |
-| ---- | ------------------------ |
+|------|--------------------------|
+| 0.17 | 0.4.0                    |
 | 0.16 | 0.2.1 - 0.3              |
 | 0.15 | 0.2.0                    |
 | 0.14 | 0.1.11 - 0.1.14          |
