@@ -18,7 +18,8 @@ exclude = ["assets/*"]
 [dependencies]
 bevy = { version = "0.18", default-features = false, features = ["bevy_window", "gamepad"] }
 avian3d = "0.6.0-rc.1"
-bevy_unified_input = "0.1.0"
+# bevy_unified_input = "0.1.0"
+bevy_unified_input = {path = "../bevy_unified_input"}
 
 [dev-dependencies]
 bevy = "0.18"

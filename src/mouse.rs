@@ -41,7 +41,7 @@ pub fn orbit_mouse(
         return;
     };
 
-    if cam.mouse_orbit_button_enabled && !cam.mouse_orbit_button.is_mouse_pressed(&mouse) {
+    if cam.mouse_orbit_button_enabled && !cam.mouse_orbit_button.pressed_mouse(&mouse) {
         return;
     }
 
