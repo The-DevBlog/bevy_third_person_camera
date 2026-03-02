@@ -1,6 +1,6 @@
 [package]
 name = "bevy_third_person_camera"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Oleks Pickle <22867443+olekspickle@users.noreply.github.com>"]
 edition = "2024"
 description = "A third person camera written for Bevy"

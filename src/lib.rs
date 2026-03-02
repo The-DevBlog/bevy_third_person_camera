@@ -321,7 +321,7 @@ fn aim(
     // check if aim button was pressed
     let is_aiming =
         cam.aim_button
-            .is_any_just_pressed(None, mouse_btns.as_ref(), gamepad_btns.as_ref());
+            .just_pressed_any(None, mouse_btns.as_ref(), gamepad_btns.as_ref());
 
     if is_aiming {
         // rotate player or target to face direction he is aiming
@@ -386,7 +386,7 @@ fn toggle_x_offset(
 
     let mut toggle_btn =
         cam.offset_toggle_key
-            .is_any_just_pressed(keys.as_ref(), None, gamepads.as_ref());
+            .just_pressed_any(keys.as_ref(), None, gamepads.as_ref());
 
     for btns in btns.iter() {
         // check if toggle btn was pressed
@@ -418,9 +418,9 @@ fn toggle_cursor(
     let Ok(mut cam) = cam_q.single_mut() else {
         return;
     };
-    let lock_pressed =
-        cam.cursor_lock_key
-            .is_any_just_pressed(keys.as_ref(), None, gamepad.as_ref());
+    let lock_pressed = cam
+        .cursor_lock_key
+        .just_pressed_any(keys.as_ref(), None, gamepad.as_ref());
     if lock_pressed {
         cam.cursor_lock_active = !cam.cursor_lock_active;
     }
