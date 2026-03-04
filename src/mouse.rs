@@ -27,10 +27,10 @@ fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
 
 // heavily referenced https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html
 pub fn orbit_mouse(
-    window_q: Query<&Window, With<PrimaryWindow>>,
-    mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
     mouse: Res<ButtonInput<MouseButton>>,
+    window_q: Query<&Window, With<PrimaryWindow>>,
     mut mouse_evr: MessageReader<MouseMotion>,
+    mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
 ) {
     let mut rotation = Vec2::ZERO;
     for ev in mouse_evr.read() {
@@ -41,7 +41,7 @@ pub fn orbit_mouse(
         return;
     };
 
-    if cam.mouse_orbit_button_enabled && !cam.mouse_orbit_button.pressed_mouse(&mouse) {
+    if cam.mouse_orbit_button_enabled && !mouse.pressed(cam.mouse_orbit_button) {
         return;
     }
 
