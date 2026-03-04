@@ -1,3 +1,7 @@
+# v0.3.1
+
+- Update to Bevy v0.18
+
 # v0.3.0
 
 - Add semantic versioning
