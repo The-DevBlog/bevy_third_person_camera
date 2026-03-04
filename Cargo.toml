@@ -7,13 +7,12 @@ description = "A third person camera written for Bevy"
 keywords = ["bevy", "camera", "orbit", "gamedev"]
 categories = ["game-development"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/olekspickle/bevy_third_person_camera"
-homepage = "https://github.com/olekspickle/bevy_third_person_camera"
+repository = "https://github.com/AndrewCS149/bevy_third_person_camera"
+homepage = "https://github.com/AndrewCS149/bevy_third_person_camera"
 readme = "README.md"
 exclude = ["assets/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 
 [dependencies]
 bevy = { version = "0.18", default-features = false, features = ["bevy_window", "gamepad"] }
