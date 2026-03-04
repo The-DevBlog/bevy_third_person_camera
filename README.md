@@ -12,7 +12,7 @@
 
 ## Getting Started
 
-Add the **bevy_third_person_camera** crate: 
+Add the **bevy_third_person_camera** crate:
 
 ```
 cargo add bevy_third_person_camera
@@ -24,18 +24,18 @@ Import the **bevy_third_person_camera** crate:
 use bevy_third_person_camera::*;
 ```
 
-Add the **ThirdPersonCameraPlugin**: 
+Add the **ThirdPersonCameraPlugin**:
 
 ```rust
 .add_plugins(ThirdPersonCameraPlugin)
 ```
 
-Add the **ThirdPersonCamera** component to the camera entity: 
+Add the **ThirdPersonCamera** component to the camera entity:
 
 ```rust
 commands.spawn((
     Camera3d::default(),
-    ThirdPersonCamera::default(), 
+    ThirdPersonCamera::default(),
 ));
 ```
 
@@ -52,13 +52,13 @@ commands.spawn((
 ));
 ```
 
-That's it! 
+That's it!
 
 ## Examples
 
 - default
 - custom
-- physics # not working at the moment. Waiting for bevy_rapier3d to support Bevy v0.15.0
+- physics
 
 ```
 cargo run --example <example name>
@@ -68,7 +68,7 @@ cargo run --example <example name>
 
 ### Offset
 
-The `offset` will 'offset' the x and y values of the camera respectively. Offset is disabled by default. Turn on with `offset_enabled: true` 
+The `offset` will 'offset' the x and y values of the camera respectively. Offset is disabled by default. Turn on with `offset_enabled: true`
 
 ```rust
 offset_enabled: true,
@@ -109,7 +109,7 @@ Orbiting is enabled by default. However, you can set the `mouse_orbit_button_ena
 
 ## Custom Settings
 
-Most settings can be overridden: 
+Most settings can be overridden:
 
 ```rust
 let gamepad = Gamepad::new(0);
@@ -170,6 +170,8 @@ When using third party physics engines such as bevy rapier 3d or avian 3d, you s
 
 | bevy | bevy_third_person_camera |
 | ---- | ------------------------ |
+| 0.18 | 0.4                      |
+| 0.17 | 0.3                      |
 | 0.16 | 0.2.1 - 0.3              |
 | 0.15 | 0.2.0                    |
 | 0.14 | 0.1.11 - 0.1.14          |

@@ -1,6 +1,9 @@
-# v0.3.1
+# v0.4.0
 
 - Update to Bevy v0.18
+
+Contributors
+- https://github.com/olekspickle
 
 # v0.3.0
 

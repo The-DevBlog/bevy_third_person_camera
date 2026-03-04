@@ -5,28 +5,26 @@ Example displaying the integration with a third party physics engine. In this ca
 The key is to run the CameraSyncSet AFTER the PhysicsSet, see line 19.
 */
 
+use avian3d::prelude::*;
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
 use bevy_third_person_camera::*;
 
 fn main() {
     App::new()
-        .add_plugins((
-            DefaultPlugins,
-            ThirdPersonCameraPlugin,
-            RapierPhysicsPlugin::<NoUserData>::default(),
-        ))
+        .add_plugins((DefaultPlugins, ThirdPersonCameraPlugin))
         .add_systems(Startup, (spawn_player, spawn_world, spawn_camera))
         .add_systems(Update, player_movement_keyboard)
-        .configure_sets(PostUpdate, CameraSyncSet.after(PhysicsSet::StepSimulation)) // DO THIS!
+        .configure_sets(
+            PostUpdate,
+            CameraSyncSet.after(PhysicsSystems::StepSimulation),
+        ) // DO THIS!
         .run();
 }
 
 #[derive(Component)]
-struct Player;
-
-#[derive(Component)]
-struct Speed(f32);
+struct Player {
+    pub speed: f32,
+}
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let player = (
@@ -34,20 +32,15 @@ fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
         Transform::from_xyz(0.0, 1.0, 0.0),
         Collider::cuboid(0.25, 0.5, 0.25),
         RigidBody::Dynamic,
-        Damping {
-            linear_damping: 5.0,
-            ..default()
-        },
-        ExternalImpulse::default(),
-        Player,
+        Player { speed: 4.0 },
+        LinearVelocity::ZERO,
         ThirdPersonCameraTarget,
-        Speed(4.0),
     );
     commands.spawn(player);
 }
 
 fn spawn_camera(mut commands: Commands) {
-    let camera = (
+    commands.spawn((
         Camera3d::default(),
         Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ThirdPersonCamera {
@@ -61,14 +54,12 @@ fn spawn_camera(mut commands: Commands) {
             zoom: Zoom::new(1.5, 3.0), // default
             ..default()
         },
-    );
-    commands.spawn(camera);
+    ));
 }
 
 fn spawn_world(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor: (Mesh3d, MeshMaterial3d<StandardMaterial>, Collider) = (
@@ -92,13 +83,13 @@ fn spawn_world(
 fn player_movement_keyboard(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
-    mut player_q: Query<(&mut ExternalImpulse, &mut Transform, &Speed), With<Player>>,
+    mut player_q: Query<(&mut LinearVelocity, &mut Transform, &mut Player), With<Player>>,
     cam_q: Query<&Transform, (With<Camera3d>, Without<Player>)>,
 ) {
-    for (mut ext_impulse, mut player_transform, player_speed) in player_q.iter_mut() {
+    for (mut linear_velocity, mut player_transform, player) in player_q.iter_mut() {
         let cam = match cam_q.single() {
             Ok(c) => c,
-            Err(e) => Err(format!("Error retrieving camera: {}", e)).unwrap(),
+            Err(e) => panic!("Error retrieving camera: {}", e),
         };
 
         let mut direction = Vec3::ZERO;
@@ -124,8 +115,8 @@ fn player_movement_keyboard(
         }
 
         direction.y = 0.0;
-        let movement = direction.normalize_or_zero() * player_speed.0 * time.delta_secs();
-        ext_impulse.impulse += movement;
+        let movement = direction.normalize_or_zero() * player.speed * time.delta_secs();
+        linear_velocity.0 += movement;
 
         // rotate player to face direction he is currently moving
         if direction.length_squared() > 0.0 {

@@ -6,7 +6,7 @@ use bevy::{
     window::PrimaryWindow,
 };
 
-use crate::{zoom_condition, ThirdPersonCamera};
+use crate::{ThirdPersonCamera, zoom_condition};
 
 pub struct MousePlugin;
 
@@ -22,7 +22,7 @@ fn orbit_condition(cam_q: Query<&ThirdPersonCamera>) -> bool {
     let Ok(cam) = cam_q.single() else {
         return true;
     };
-    return cam.cursor_lock_active;
+    cam.cursor_lock_active
 }
 
 // heavily referenced https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html
@@ -30,7 +30,7 @@ pub fn orbit_mouse(
     window_q: Query<&Window, With<PrimaryWindow>>,
     mut cam_q: Query<(&ThirdPersonCamera, &mut Transform), With<ThirdPersonCamera>>,
     mouse: Res<ButtonInput<MouseButton>>,
-    mut mouse_evr: EventReader<MouseMotion>,
+    mut mouse_evr: MessageReader<MouseMotion>,
 ) {
     let mut rotation = Vec2::ZERO;
     for ev in mouse_evr.read() {
@@ -41,7 +41,7 @@ pub fn orbit_mouse(
         return;
     };
 
-    if cam.mouse_orbit_button_enabled && !mouse.pressed(cam.mouse_orbit_button) {
+    if cam.mouse_orbit_button_enabled && !cam.mouse_orbit_button.pressed_mouse(&mouse) {
         return;
     }
 
@@ -49,10 +49,7 @@ pub fn orbit_mouse(
 
     if rotation.length_squared() > 0.0 {
         let window = window_q.single().unwrap();
-        let delta_x = {
-            let delta = rotation.x / window.width() * std::f32::consts::PI * cam.sensitivity.x;
-            delta
-        };
+        let delta_x = rotation.x / window.width() * std::f32::consts::PI * cam.sensitivity.x;
 
         let delta_y = rotation.y / window.height() * PI * cam.sensitivity.y;
         let yaw = Quat::from_rotation_y(-delta_x);
@@ -73,17 +70,16 @@ pub fn orbit_mouse(
     cam_transform.translation = rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.zoom.radius));
 }
 
-fn zoom_mouse(mut scroll_evr: EventReader<MouseWheel>, mut cam_q: Query<&mut ThirdPersonCamera>) {
+fn zoom_mouse(mut scroll_evr: MessageReader<MouseWheel>, mut cam_q: Query<&mut ThirdPersonCamera>) {
     let mut scroll = 0.0;
     for ev in scroll_evr.read() {
         scroll += ev.y;
     }
 
-    if let Ok(mut cam) = cam_q.single_mut() {
-        if scroll.abs() > 0.0 {
-            let new_radius =
-                cam.zoom.radius - scroll * cam.zoom.radius * 0.1 * cam.zoom_sensitivity;
-            cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
-        }
+    if let Ok(mut cam) = cam_q.single_mut()
+        && scroll.abs() > 0.0
+    {
+        let new_radius = cam.zoom.radius - scroll * cam.zoom.radius * 0.1 * cam.zoom_sensitivity;
+        cam.zoom.radius = new_radius.clamp(cam.zoom.min, cam.zoom.max);
     }
 }
