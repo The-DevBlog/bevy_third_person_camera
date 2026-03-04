@@ -1,7 +1,6 @@
-use std::f32::consts::PI;
-
-use crate::{zoom_condition, ThirdPersonCamera};
+use crate::{ThirdPersonCamera, zoom_condition};
 use bevy::{prelude::*, window::PrimaryWindow};
+use std::f32::consts::PI;
 
 pub struct GamePadPlugin;
 
@@ -73,26 +72,21 @@ pub fn orbit_gamepad(
     if cam.mouse_orbit_button_enabled && !gamepad.pressed(cam.gamepad_settings.mouse_orbit_button) {
         return;
     }
-
-    let x_axis = gamepad.right_stick().x;
-    let y_axis = gamepad.right_stick().y;
+    let (x, y) = (gamepad.right_stick().x, gamepad.right_stick().y);
 
     let deadzone = 0.5;
     let mut rotation = Vec2::ZERO;
-    let (x, y) = (x_axis, y_axis);
     if x.abs() > deadzone || y.abs() > deadzone {
         rotation = Vec2::new(x, y);
     }
 
     if rotation.length_squared() > 0.0 {
         let window = window_q.single().unwrap();
-        let delta_x = {
-            let delta = rotation.x / window.width()
-                * std::f32::consts::PI
-                * 2.0
-                * cam.gamepad_settings.sensitivity.x;
-            delta
-        };
+        let delta_x = rotation.x / window.width()
+            * std::f32::consts::PI
+            * 2.0
+            * cam.gamepad_settings.sensitivity.x;
+
         let delta_y = -rotation.y / window.height() * PI * cam.gamepad_settings.sensitivity.y;
         let yaw = Quat::from_rotation_y(-delta_x);
         let pitch = Quat::from_rotation_x(-delta_y);
