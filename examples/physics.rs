@@ -26,7 +26,7 @@ struct Player {
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let player = (
-        SceneRoot(assets.load("Player.gltf#Scene0")),
+        WorldAssetRoot(assets.load("Player.gltf#Scene0")),
         Transform::from_xyz(0.0, 1.0, 0.0),
         Collider::cuboid(0.25, 0.5, 0.25),
         RigidBody::Dynamic,

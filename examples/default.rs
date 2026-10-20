@@ -13,7 +13,7 @@ struct Player;
 
 fn spawn_player(mut commands: Commands, assets: Res<AssetServer>) {
     let player = (
-        SceneRoot(assets.load("Player.gltf#Scene0")),
+        WorldAssetRoot(assets.load("Player.gltf#Scene0")),
         Transform::from_xyz(0.0, 0.5, 0.0),
         Player,
         ThirdPersonCameraTarget, // ADD THIS
